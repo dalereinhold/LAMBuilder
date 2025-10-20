@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LAM Builder</title>
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+  <div id="sidebar">
+    <h2>LAM Builder</h2>
+    <button id="addElementBtn">+ Add Element</button>
+    <ul id="elementList"></ul>
+  </div>
+
+  <div id="editor">
+    <h2>Properties</h2>
+    <div id="panelDataEditor"></div>
+    <div id="propertyEditor">Select an element to edit.</div>
+  </div>
+
+  <div id="preview">
+    <h2>Lua Preview</h2>
+    <pre id="luaOutput"></pre>
+    <button id="copyBtn">Copy Lua</button>
+  </div>
+
+  <script src="src/app.js"></script>
+  <script src="src/ui.js"></script>
+  <script src="src/exporter.js"></script>
+</body>
+</html>
