@@ -8,23 +8,26 @@
 <body>
   <div id="sidebar">
     <h2>LAM Builder</h2>
-    <button id="addElementBtn">+ Add Element</button>
-    <ul id="elementList"></ul>
+    <button id="addPanelDataBtn">Add Panel Data</button>
+    <button id="addOptionBtn">Add New Option</button>
+    <ul id="optionsList"></ul>
   </div>
 
   <div id="editor">
-    <h2>Properties</h2>
+    <h2>Settings Panel</h2>
     <div id="panelDataEditor"></div>
-    <div id="propertyEditor">Select an element to edit.</div>
+    <div id="propertyEditor">Select an option to edit.</div>
   </div>
 
-  <div id="preview">
-    <h2>Lua Preview</h2>
-    <pre id="luaOutput"></pre>
+<div id="preview">
+  <h2 id="previewTitle">Lua Preview</h2>
+  <div id="previewOutput" class="preview-box"></div>
+  <div class="preview-controls">
+    <button id="togglePreviewBtn">Switch to Live Preview</button>
     <button id="copyBtn">Copy Lua</button>
   </div>
+</div>
 
-  <!-- Load combined script -->
   <script src="src/main.js"></script>
 </body>
 </html>
