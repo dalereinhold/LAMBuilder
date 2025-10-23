@@ -35,11 +35,11 @@ body {
   display: flex;
   flex-direction: column;
 
-  /* Default Lua Preview: black background */
-  background: #111;
-  color: #0f0;
-  font-family: monospace;
-  padding: 12px;
+  /* Default Lua Preview: dark theme */
+  background: #1e1e1e;
+  color: #d4d4d4;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  padding: 0;
 }
 
 /* Live Preview active */
@@ -54,6 +54,56 @@ body {
   overflow: auto;
   white-space: pre;
 }
+
+/* Lua syntax highlighting */
+#previewOutput:not(.live) {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 0;
+  position: relative;
+}
+
+.lua-code-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.lua-line-numbers {
+  background: #252526;
+  color: #858585;
+  padding: 12px 8px;
+  text-align: right;
+  user-select: none;
+  border-right: 1px solid #3e3e42;
+  min-width: 40px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.lua-code-content {
+  flex: 1;
+  padding: 12px;
+  overflow: auto;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Lua syntax highlighting colors */
+.lua-keyword { color: #569cd6; font-weight: bold; }
+.lua-string { color: #ce9178; }
+.lua-comment { color: #6a9955; font-style: italic; }
+.lua-number { color: #b5cea8; }
+.lua-function { color: #dcdcaa; }
+.lua-operator { color: #d4d4d4; }
+.lua-bracket { color: #ffd700; }
+.lua-variable { color: #9cdcfe; }
+.lua-builtin { color: #4ec9b0; }
 
 /* Live Preview inner controls over overlay */
 #previewOutput.live {

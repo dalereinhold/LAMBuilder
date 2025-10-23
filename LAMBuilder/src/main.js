@@ -7,7 +7,7 @@
 /////////////////////
 // Core app state
 /////////////////////
-let elements = [];
+let objects = [];
 let selectedIndex = null;
 let panelData = null;
 let editPanelData = false;
@@ -19,10 +19,10 @@ let editPanelData = false;
 const sampleTemplate = {
   panelData: {
     type: "panel",
-    name: "Window Title",
-    displayName: "Longer Window Title",
-    author: "Seerah",
-    version: "1.3",
+    name: "My Addon",
+    displayName: "My Addon Settings",
+    author: "AuthorName",
+    version: "1.0",
     slashCommand: "/myaddon",
     registerForRefresh: true,
     registerForDefaults: true,
@@ -36,18 +36,8 @@ const sampleTemplate = {
     {
       type: "description",
       title: null,
-      text: "My description text to display. blah blah blah blah blah blah blah - even more sample text!!",
+      text: "My description text to display.",
       width: "full",
-    },
-    {
-      type: "dropdown",
-      name: "My Dropdown",
-      tooltip: "Dropdown's tooltip text.",
-      choices: ["table", "of", "choices"],
-      getFunc: { __luaFn: true, code: "function() return \"of\" end" },
-      setFunc: { __luaFn: true, code: "function(var) print(var) end" },
-      width: "half",
-      warning: "Will need to reload the UI.",
     },
     {
       type: "dropdown",
@@ -160,56 +150,124 @@ function addPanelData() {
   renderUI();
 }
 
-function addHeader() {
-  const newHeader = {
-    type: "header",
-    name: "New Header",
-    width: "full",
-  };
-
-  elements.push(newHeader);
-  selectedIndex = elements.length - 1;
-  renderUI();
-}
-
-function addDescription() {
-  const newDesc = {
-    type: "description",
-    title: null,
-    text: "Description text",
-    width: "full",
-  };
-  elements.push(newDesc);
-  selectedIndex = elements.length - 1;
-  renderUI();
-}
-
 function addOption() {
-  const newEl = {
-    type: "checkbox",
-    name: "New Option",
-    tooltip: "Add tooltip here",
-    default: true,
+  // Define templates for each type with all available fields
+  const templates = {
+    checkbox: {
+      type: "checkbox",
+      name: "New Checkbox",
+      tooltip: "",
+      getFunc: { __luaFn: true, code: "function() return true end" },
+      setFunc: { __luaFn: true, code: "function(value) d(value) end" },
+      width: "",
+      warning: "",
+      default: ""
+    },
+    slider: {
+      type: "slider",
+      name: "New Slider",
+      tooltip: "",
+      min: "",
+      max: "",
+      step: "",
+      getFunc: { __luaFn: true, code: "function() return 0 end" },
+      setFunc: { __luaFn: true, code: "function(value) d(value) end" },
+      width: "",
+      warning: "",
+      default: ""
+    },
+    dropdown: {
+      type: "dropdown",
+      name: "New Dropdown",
+      tooltip: "",
+      choices: [],
+      getFunc: { __luaFn: true, code: "function() return \"\" end" },
+      setFunc: { __luaFn: true, code: "function(var) print(var) end" },
+      width: "",
+      warning: ""
+    },
+    description: {
+      type: "description",
+      title: "",
+      text: "Description text",
+      width: ""
+    },
+    header: {
+      type: "header",
+      name: "New Header",
+      width: ""
+    },
+    button: {
+      type: "button",
+      name: "New Button",
+      tooltip: "",
+      func: { __luaFn: true, code: "function() d(\"button pressed!\") end" },
+      width: "",
+      warning: ""
+    },
+    submenu: {
+      type: "submenu",
+      name: "New Submenu",
+      tooltip: "",
+      controls: [],
+      width: ""
+    },
+    editbox: {
+      type: "editbox",
+      name: "New Editbox",
+      tooltip: "",
+      getFunc: { __luaFn: true, code: "function() return \"\" end" },
+      setFunc: { __luaFn: true, code: "function(text) print(text) end" },
+      isMultiline: "",
+      width: "",
+      warning: "",
+      default: ""
+    },
+    colorpicker: {
+      type: "colorpicker",
+      name: "New Color Picker",
+      tooltip: "",
+      getFunc: { __luaFn: true, code: "function() return 1, 0, 0, 1 end" },
+      setFunc: { __luaFn: true, code: "function(r,g,b,a) print(r, g, b, a) end" },
+      width: "",
+      warning: ""
+    },
+    custom: {
+      type: "custom",
+      reference: "",
+      refreshFunc: { __luaFn: true, code: "function(customControl) end" },
+      width: ""
+    },
+    texture: {
+      type: "texture",
+      image: "",
+      imageWidth: "",
+      imageHeight: "",
+      tooltip: "",
+      width: ""
+    }
   };
 
-  elements.push(newEl);
-  selectedIndex = elements.length - 1;
+  const newObj = deepClone(templates.checkbox); // Default to checkbox
+
+  objects.push(newObj);
+  selectedIndex = objects.length - 1;
   renderUI();
 }
 
-function selectElement(index) {
+function selectObject(index) {
   selectedIndex = index;
   renderUI();
 }
 
-function updateElementProperty(key, value) {
+function updateObjectProperty(key, value) {
   if (selectedIndex === null) return;
-  elements[selectedIndex][key] = value;
+  objects[selectedIndex][key] = value;
   renderPreview();
 }
 
-function removeElement(index) {
-  elements.splice(index, 1);
+function removeObject(index) {
+  objects.splice(index, 1);
   if (selectedIndex === index) selectedIndex = null;
   renderUI();
 }
@@ -217,7 +275,7 @@ function removeElement(index) {
 function loadSampleMenu() {
   const clone = deepClone(sampleTemplate);
   panelData = clone.panelData;
-  elements = clone.optionsTable;
+  objects = clone.optionsTable;
   editPanelData = true;
   selectedIndex = null;
   renderUI();
@@ -226,7 +284,7 @@ function loadSampleMenu() {
 /////////////////////
 // Exporter: JS -> Lua
 /////////////////////
-function exportToLua(elementsArr, panelDataOverride) {
+function exportToLua(objectsArr, panelDataOverride) {
   const pd = panelDataOverride || panelData;
   let lua = "";
 
@@ -244,12 +302,18 @@ function exportToLua(elementsArr, panelDataOverride) {
 
   lua += "local optionsTable = {\n";
 
-  elementsArr.forEach(el => {
+  objectsArr.forEach(obj => {
     lua += "    {\n";
-    for (const [k, v] of Object.entries(el)) {
+    for (const [key, v] of Object.entries(obj)) {
+      // Skip blank fields (empty strings, empty arrays, null, undefined)
+      if (v === "" || v === null || v === undefined ||
+        (Array.isArray(v) && v.length === 0)) {
+        continue;
+      }
+
       // write property
       // 'type' and 'name' commonly strings: still go through luaValue to handle function objects etc.
-      lua += `        ${k} = ${luaValue(v)},\n`;
+      lua += `        ${key} = ${luaValue(v)},\n`;
     }
     lua += "    },\n";
   });
@@ -317,17 +381,6 @@ if (addPanelBtn && !addPanelBtn.dataset.bound) {
   addPanelBtn.dataset.bound = true;
 }
 
-const addHeaderBtn = document.getElementById("addHeaderBtn");
-if (addHeaderBtn && !addHeaderBtn.dataset.bound) {
-  addHeaderBtn.onclick = addHeader;
-  addHeaderBtn.dataset.bound = true;
-}
-
-const addDescBtn = document.getElementById("addDescriptionBtn");
-if (addDescBtn && !addDescBtn.dataset.bound) {
-  addDescBtn.onclick = addDescription;
-  addDescBtn.dataset.bound = true;
-}
 
 const addBtn = document.getElementById("addOptionBtn");
 if (addBtn && !addBtn.dataset.bound) {
@@ -348,7 +401,7 @@ if (sampleBtn && !sampleBtn.dataset.bound) {
 const copyBtn = document.getElementById("copyBtn");
 if (copyBtn && !copyBtn.dataset.bound) {
   copyBtn.onclick = () => {
-    navigator.clipboard.writeText(exportToLua(elements, panelData));
+    navigator.clipboard.writeText(exportToLua(objects, panelData));
     alert("Lua copied to clipboard!");
   };
   copyBtn.dataset.bound = true;
@@ -402,19 +455,15 @@ function renderPanelDataEditor() {
     label.textContent = key;
     label.style.width = "150px";
 
-    // Choose input type based on the value's JS type
-    let input;
+    // All fields are input fields
+    const input = document.createElement("input");
     if (typeof value === "boolean") {
-      input = document.createElement("input");
-      input.type = "checkbox";
-      input.checked = value;
-      input.onchange = e => {
-        panelData[key] = e.target.checked;
+      input.value = value ? "true" : "false";
+      input.oninput = e => {
+        panelData[key] = e.target.value === "true";
         renderPreview();
       };
     } else if (typeof value === "number") {
-      input = document.createElement("input");
-      input.type = "number";
       input.value = value;
       input.oninput = e => {
         const n = parseFloat(e.target.value);
@@ -422,14 +471,13 @@ function renderPanelDataEditor() {
         renderPreview();
       };
     } else {
-      input = document.createElement("input");
       input.value = value == null ? "" : value;
-      input.style.flex = "1";
       input.oninput = e => {
         panelData[key] = e.target.value;
         renderPreview();
       };
     }
+    input.style.flex = "1";
 
     wrapper.appendChild(label);
     wrapper.appendChild(input);
@@ -454,12 +502,12 @@ function renderSidebar() {
   const list = document.getElementById("optionsList");
   if (!list) return;
   list.innerHTML = "";
-  elements.forEach((el, i) => {
+  objects.forEach((obj, i) => {
     const li = document.createElement("li");
-    li.textContent = `${i + 1}. ${el.name || "Unnamed"} (${el.type})`;
+    li.textContent = `${i + 1}. ${obj.name || "Unnamed"} (${obj.type})`;
     li.style.cursor = "pointer";
     li.style.marginBottom = "5px";
-    li.onclick = () => selectElement(i);
+    li.onclick = () => selectObject(i);
     if (i === selectedIndex) li.style.color = "#0f0";
     list.appendChild(li);
   });
@@ -469,7 +517,7 @@ function renderEditor() {
   const editor = document.getElementById("propertyEditor");
   if (!editor) return;
 
-  if (!elements.length) {
+  if (!objects.length) {
     editor.innerHTML = `
       <h3>Options Properties</h3>
       <p>No options added. Click <strong>"Add Option"</strong> to create one.</p>
@@ -485,7 +533,7 @@ function renderEditor() {
     return;
   }
 
-  const el = elements[selectedIndex];
+  const obj = objects[selectedIndex];
   editor.innerHTML = "<h3>Options Properties</h3>";
 
   // Type selector (keep common choices, but user can edit raw type below)
@@ -496,12 +544,118 @@ function renderEditor() {
     const opt = document.createElement("option");
     opt.value = t;
     opt.textContent = t;
-    if (el.type === t) opt.selected = true;
+    if (obj.type === t) opt.selected = true;
     typeSelect.appendChild(opt);
   });
   typeSelect.onchange = e => {
-    updateElementProperty("type", e.target.value);
+    const newType = e.target.value;
+
+    // Define templates for each type with all available fields
+    const templates = {
+      checkbox: {
+        type: "checkbox",
+        name: obj.name || "New Checkbox",
+        tooltip: "",
+        getFunc: { __luaFn: true, code: "function() return true end" },
+        setFunc: { __luaFn: true, code: "function(value) d(value) end" },
+        width: "",
+        warning: "",
+        default: ""
+      },
+      slider: {
+        type: "slider",
+        name: obj.name || "New Slider",
+        tooltip: "",
+        min: "",
+        max: "",
+        step: "",
+        getFunc: { __luaFn: true, code: "function() return 0 end" },
+        setFunc: { __luaFn: true, code: "function(value) d(value) end" },
+        width: "",
+        warning: "",
+        default: ""
+      },
+      dropdown: {
+        type: "dropdown",
+        name: obj.name || "New Dropdown",
+        tooltip: "",
+        choices: [],
+        getFunc: { __luaFn: true, code: "function() return \"\" end" },
+        setFunc: { __luaFn: true, code: "function(var) print(var) end" },
+        width: "",
+        warning: ""
+      },
+      description: {
+        type: "description",
+        title: "",
+        text: "Description text",
+        width: ""
+      },
+      header: {
+        type: "header",
+        name: obj.name || "New Header",
+        width: ""
+      },
+      button: {
+        type: "button",
+        name: obj.name || "New Button",
+        tooltip: "",
+        func: { __luaFn: true, code: "function() d(\"button pressed!\") end" },
+        width: "",
+        warning: ""
+      },
+      submenu: {
+        type: "submenu",
+        name: obj.name || "New Submenu",
+        tooltip: "",
+        controls: [],
+        width: ""
+      },
+      editbox: {
+        type: "editbox",
+        name: obj.name || "New Editbox",
+        tooltip: "",
+        getFunc: { __luaFn: true, code: "function() return \"\" end" },
+        setFunc: { __luaFn: true, code: "function(text) print(text) end" },
+        isMultiline: "",
+        width: "",
+        warning: "",
+        default: ""
+      },
+      colorpicker: {
+        type: "colorpicker",
+        name: obj.name || "New Color Picker",
+        tooltip: "",
+        getFunc: { __luaFn: true, code: "function() return 1, 0, 0, 1 end" },
+        setFunc: { __luaFn: true, code: "function(r,g,b,a) print(r, g, b, a) end" },
+        width: "",
+        warning: ""
+      },
+      custom: {
+        type: "custom",
+        reference: "",
+        refreshFunc: { __luaFn: true, code: "function(customControl) end" },
+        width: ""
+      },
+      texture: {
+        type: "texture",
+        image: "",
+        imageWidth: "",
+        imageHeight: "",
+        tooltip: "",
+        width: ""
+      }
+    };
+
+    // Replace the current object with the template for the new type
+    if (templates[newType]) {
+      objects[selectedIndex] = deepClone(templates[newType]);
+    } else {
+      updateObjectProperty("type", newType);
+    }
+
     renderEditor(); // re-render to reflect fields
+    renderSidebar(); // update sidebar to show new name
   };
 
   const typeRow = document.createElement("div");
@@ -532,7 +686,7 @@ function renderEditor() {
       ta.style.width = "100%";
       ta.style.height = "70px";
       ta.oninput = e => {
-        elements[selectedIndex][key].code = e.target.value;
+        objects[selectedIndex][key].code = e.target.value;
         renderPreview();
       };
       wrapper.appendChild(label);
@@ -554,7 +708,7 @@ function renderEditor() {
       ta.onblur = e => {
         try {
           const parsed = JSON.parse(e.target.value);
-          elements[selectedIndex][key] = parsed;
+          objects[selectedIndex][key] = parsed;
           renderPreview();
           renderSidebar();
         } catch (err) {
@@ -578,54 +732,42 @@ function renderEditor() {
       return;
     }
 
-    // Primitive editors
+    // All fields are input fields
+    const inp = document.createElement("input");
+    inp.type = "text";
     if (typeof value === "boolean") {
-      const inp = document.createElement("input");
-      inp.type = "checkbox";
-      inp.checked = value;
-      inp.onchange = e => {
-        elements[selectedIndex][key] = e.target.checked;
+      inp.value = value ? "true" : "false";
+      inp.oninput = e => {
+        objects[selectedIndex][key] = e.target.value === "true";
         renderPreview();
+        renderSidebar();
       };
-      wrapper.appendChild(label);
-      wrapper.appendChild(inp);
-      editor.appendChild(wrapper);
-      return;
-    }
-
-    if (typeof value === "number") {
-      const inp = document.createElement("input");
-      inp.type = "number";
+    } else if (typeof value === "number") {
       inp.value = String(value);
       inp.oninput = e => {
         const n = parseFloat(e.target.value);
-        elements[selectedIndex][key] = isNaN(n) ? e.target.value : n;
+        objects[selectedIndex][key] = isNaN(n) ? e.target.value : n;
         renderPreview();
+        renderSidebar();
       };
-      wrapper.appendChild(label);
-      wrapper.appendChild(inp);
-      editor.appendChild(wrapper);
-      return;
+    } else {
+      inp.value = value == null ? "" : value;
+      inp.oninput = e => {
+        objects[selectedIndex][key] = e.target.value;
+        renderPreview();
+        renderSidebar();
+      };
     }
-
-    // default text input
-    const inp = document.createElement("input");
-    inp.type = "text";
-    inp.value = value == null ? "" : value;
     inp.style.flex = "1";
-    inp.oninput = e => {
-      elements[selectedIndex][key] = e.target.value;
-      renderPreview();
-      renderSidebar();
-    };
     wrapper.appendChild(label);
     wrapper.appendChild(inp);
     editor.appendChild(wrapper);
   }
 
-  // Render every property of the element
-  for (const key of Object.keys(el)) {
-    addField(key, el[key]);
+  // Render every property of the object (except type which is handled by dropdown)
+  for (const key of Object.keys(obj)) {
+    if (key === "type") continue; // Skip type field since it's handled by dropdown
+    addField(key, obj[key]);
   }
 
   // Button to add a new blank property on this element
@@ -636,7 +778,7 @@ function renderEditor() {
     const propName = prompt("Property name (key):");
     if (!propName) return;
     // default string value
-    elements[selectedIndex][propName] = "";
+    objects[selectedIndex][propName] = "";
     renderEditor();
   };
   editor.appendChild(addPropBtn);
@@ -645,12 +787,149 @@ function renderEditor() {
   removeBtn.textContent = "Delete Option";
   removeBtn.onclick = () => {
     if (confirm("Delete this option?")) {
-      removeElement(selectedIndex);
+      removeObject(selectedIndex);
     }
   };
   removeBtn.style.marginTop = "10px";
   removeBtn.style.marginLeft = "8px";
   editor.appendChild(removeBtn);
+}
+
+// Lua syntax highlighting function
+function highlightLuaCode(code) {
+  const lines = code.split('\n');
+  const lineNumbers = lines.map((_, i) => i + 1).join('\n');
+
+  // Simple tokenizer to avoid overlapping spans
+  function tokenizeLine(line) {
+    const tokens = [];
+    let i = 0;
+    
+    while (i < line.length) {
+      const char = line[i];
+      
+      // Skip whitespace
+      if (/\s/.test(char)) {
+        let whitespace = '';
+        while (i < line.length && /\s/.test(line[i])) {
+          whitespace += line[i];
+          i++;
+        }
+        tokens.push({ type: 'whitespace', value: whitespace });
+        continue;
+      }
+      
+      // Comments
+      if (char === '-' && line[i + 1] === '-') {
+        const comment = line.substring(i);
+        tokens.push({ type: 'comment', value: comment });
+        break; // Rest of line is comment
+      }
+      
+      // Strings
+      if (char === '"') {
+        let string = '"';
+        i++;
+        while (i < line.length && line[i] !== '"') {
+          if (line[i] === '\\' && i + 1 < line.length) {
+            string += line[i] + line[i + 1];
+            i += 2;
+          } else {
+            string += line[i];
+            i++;
+          }
+        }
+        if (i < line.length) {
+          string += '"';
+          i++;
+        }
+        tokens.push({ type: 'string', value: string });
+        continue;
+      }
+      
+      // Numbers
+      if (/\d/.test(char)) {
+        let number = '';
+        while (i < line.length && /[\d.]/.test(line[i])) {
+          number += line[i];
+          i++;
+        }
+        tokens.push({ type: 'number', value: number });
+        continue;
+      }
+      
+      // Identifiers and keywords
+      if (/[a-zA-Z_]/.test(char)) {
+        let identifier = '';
+        while (i < line.length && /[a-zA-Z0-9_]/.test(line[i])) {
+          identifier += line[i];
+          i++;
+        }
+        
+        const keywords = ['local', 'function', 'end', 'if', 'then', 'else', 'elseif', 'for', 'while', 'do', 'repeat', 'until', 'break', 'return', 'and', 'or', 'not', 'true', 'false', 'nil'];
+        const builtins = ['print', 'pairs', 'ipairs', 'next', 'type', 'tostring', 'tonumber', 'table', 'string', 'math'];
+        
+        if (keywords.includes(identifier)) {
+          tokens.push({ type: 'keyword', value: identifier });
+        } else if (builtins.includes(identifier)) {
+          tokens.push({ type: 'builtin', value: identifier });
+        } else {
+          tokens.push({ type: 'identifier', value: identifier });
+        }
+        continue;
+      }
+      
+      // Operators and brackets
+      if (/[+\-*/%^#=<>~]/.test(char)) {
+        tokens.push({ type: 'operator', value: char });
+        i++;
+        continue;
+      }
+      
+      if (/[{}[\]()]/.test(char)) {
+        tokens.push({ type: 'bracket', value: char });
+        i++;
+        continue;
+      }
+      
+      // Everything else
+      tokens.push({ type: 'other', value: char });
+      i++;
+    }
+    
+    return tokens;
+  }
+
+  // Process each line
+  const processedLines = lines.map(line => {
+    const tokens = tokenizeLine(line);
+    return tokens.map(token => {
+      const escapedValue = token.value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+        
+      switch (token.type) {
+        case 'comment': return `<span class="lua-comment">${escapedValue}</span>`;
+        case 'string': return `<span class="lua-string">${escapedValue}</span>`;
+        case 'keyword': return `<span class="lua-keyword">${escapedValue}</span>`;
+        case 'number': return `<span class="lua-number">${escapedValue}</span>`;
+        case 'builtin': return `<span class="lua-builtin">${escapedValue}</span>`;
+        case 'operator': return `<span class="lua-operator">${escapedValue}</span>`;
+        case 'bracket': return `<span class="lua-bracket">${escapedValue}</span>`;
+        default: return escapedValue;
+      }
+    }).join('');
+  });
+
+  const highlightedCode = processedLines.join('\n');
+
+  return `
+    <div class="lua-code-container">
+      <div class="lua-line-numbers">${lineNumbers}</div>
+      <div class="lua-code-content">${highlightedCode}</div>
+    </div>
+  `;
 }
 
 function renderPreview() {
@@ -668,7 +947,9 @@ function renderPreview() {
     title.textContent = "Lua Preview";
     toggleBtn.textContent = "Switch to Live Preview";
 
-    output.textContent = exportToLua(elements, panelData); // green-on-black text
+    const luaCode = exportToLua(objects, panelData);
+    const highlightedCode = highlightLuaCode(luaCode);
+    output.innerHTML = highlightedCode;
   } else {
     // Live Preview
     preview.classList.add("live");     // sets background image on outer div
@@ -677,9 +958,9 @@ function renderPreview() {
     toggleBtn.textContent = "Switch to Lua Preview";
 
     let html = "";
-    elements.forEach(el => {
-      const name = el.name || "(unnamed)";
-      const type = (el.type || "unknown").toLowerCase();
+    objects.forEach(obj => {
+      const name = obj.name || "(unnamed)";
+      const type = (obj.type || "unknown").toLowerCase();
 
       html += `<div style="margin-bottom:8px;">`;
       switch (type) {
@@ -687,15 +968,15 @@ function renderPreview() {
           html += `<label><input type="checkbox"> ${escapeHtml(name)}</label>`;
           break;
         case "slider":
-          const min = el.min != null ? el.min : 0;
-          const max = el.max != null ? el.max : 100;
-          const value = el.default != null ? el.default : Math.floor((min + max) / 2);
+          const min = obj.min != null ? obj.min : 0;
+          const max = obj.max != null ? obj.max : 100;
+          const value = obj.default != null ? obj.default : Math.floor((min + max) / 2);
           html += `<label>${escapeHtml(name)}</label><input type="range" min="${escapeHtml(min)}" max="${escapeHtml(max)}" value="${escapeHtml(value)}">`;
           break;
         case "dropdown":
           html += `<label>${escapeHtml(name)}</label><select>`;
-          if (Array.isArray(el.choices)) {
-            el.choices.forEach(c => {
+          if (Array.isArray(obj.choices)) {
+            obj.choices.forEach(c => {
               html += `<option>${escapeHtml(c)}</option>`;
             });
           } else {
@@ -704,7 +985,7 @@ function renderPreview() {
           html += `</select>`;
           break;
         case "description":
-          html += `<p style="margin:0; font-style:italic;">${escapeHtml(el.text || el.name || "")}</p>`;
+          html += `<p style="margin:0; font-style:italic;">${escapeHtml(obj.text || obj.name || "")}</p>`;
           break;
         case "header":
           html += `<h3 style="margin: 8px 0;">${escapeHtml(name)}</h3>`;
@@ -714,8 +995,8 @@ function renderPreview() {
           break;
         case "submenu":
           html += `<details><summary>${escapeHtml(name)}</summary>`;
-          if (Array.isArray(el.controls)) {
-            el.controls.forEach(c => {
+          if (Array.isArray(obj.controls)) {
+            obj.controls.forEach(c => {
               html += `<div style="margin:6px 8px 6px 8px;">`;
               html += `<small style="color:#999">${escapeHtml(c.type || "")}</small><br>`;
               html += `${escapeHtml(c.name || "")}`;
@@ -732,7 +1013,7 @@ function renderPreview() {
       html += `</div>`;
     });
 
-    output.innerHTML = html || "<em>No elements to preview</em>";
+    output.innerHTML = html || "<em>No objects to preview</em>";
   }
 }
 

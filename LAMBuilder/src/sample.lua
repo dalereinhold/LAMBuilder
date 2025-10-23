@@ -33,16 +33,6 @@ local optionsTable = {
         warning = "Will need to reload the UI.",	--(optional)
     },
     {
-        type = "dropdown",
-        name = "My Dropdown",
-        tooltip = "Dropdown's tooltip text.",
-        choices = {"table", "of", "choices"},
-        getFunc = function() return "of" end,
-        setFunc = function(var) print(var) end,
-        width = "half",	--or "full" (optional)
-        warning = "Will need to reload the UI.",	--(optional)
-    },
-    {
         type = "slider",
         name = "My Slider",
         tooltip = "Slider's tooltip text.",
