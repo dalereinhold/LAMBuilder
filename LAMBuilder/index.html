@@ -13,23 +13,34 @@
     <h2>LAM Builder</h2>
     <button id="sampleMenuBtn">Sample Menu</button>
     <button id="addPanelDataBtn">Add Panel</button>
-    <button id="addOptionBtn">Add Option</button>
-    <ul id="optionsList"></ul>
+    <hr style="margin: 10px 0; border: none; border-top: 1px solid #555;">
+    <button id="addHeaderBtn">Add Header</button>
+    <button id="addDescriptionBtn">Add Description</button>
+    <button id="addCheckboxBtn">Add Checkbox</button>
+    <button id="addSliderBtn">Add Slider</button>
+    <button id="addDropdownBtn">Add Dropdown</button>
+    <button id="addButtonBtn">Add Button</button>
+    <button id="addColorpickerBtn">Add Color Picker</button>
+    <button id="addSubmenuBtn">Add Submenu</button>
   </div>
 
   <div id="editor">
     <h2>Settings Panel</h2>
     <div id="panelDataEditor"></div>
-    <div id="propertyEditor">Select an option to edit.</div>
+    <div id="objectsContainer">
+      <p>No objects added. Use the buttons on the left to add objects.</p>
+    </div>
   </div>
 
   <div id="preview">
-    <h2 id="previewTitle">Lua Preview</h2>
-    <div id="previewOutput" class="preview-box"></div>
-    <div class="preview-controls">
-      <button id="togglePreviewBtn">Switch to Live Preview</button>
-      <button id="copyBtn">Copy Lua</button>
+    <div class="preview-header">
+      <h2 id="previewTitle">Lua Preview</h2>
+      <div class="preview-controls">
+        <button id="togglePreviewBtn">Switch to Live Preview</button>
+        <button id="copyBtn">Copy Lua</button>
+      </div>
     </div>
+    <div id="previewOutput" class="preview-box"></div>
   </div>
 
   <script src="src/main.js"></script>

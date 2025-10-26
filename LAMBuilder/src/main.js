@@ -30,14 +30,82 @@ const sampleTemplate = {
   optionsTable: [
     {
       type: "header",
-      name: "My Header",
+      name: "My First Header",
       width: "full",
     },
     {
       type: "description",
       title: null,
-      text: "My description text to display.",
+      text: "This is my first section containing only full widths.",
       width: "full",
+    },
+    {
+      type: "checkbox",
+      name: "My Checkbox",
+      tooltip: "Checkbox's tooltip text.",
+      getFunc: { __luaFn: true, code: "function() return true end" },
+      setFunc: { __luaFn: true, code: "function(value) d(value) end" },
+      width: "full",
+      warning: "Will need to reload the UI.",
+    },
+    {
+      type: "dropdown",
+      name: "My Dropdown",
+      tooltip: "Dropdown's tooltip text.",
+      choices: ["table", "of", "choices"],
+      getFunc: { __luaFn: true, code: "function() return \"of\" end" },
+      setFunc: { __luaFn: true, code: "function(var) print(var) end" },
+      width: "full",
+      warning: "Will need to reload the UI.",
+    },
+    {
+      type: "slider",
+      name: "My Slider",
+      tooltip: "Slider's tooltip text.",
+      min: 0,
+      max: 20,
+      step: 1,
+      getFunc: { __luaFn: true, code: "function() return 3 end" },
+      setFunc: { __luaFn: true, code: "function(value) d(value) end" },
+      width: "full",
+      default: 5,
+    },
+    {
+      type: "colorpicker",
+      name: "My Color Picker",
+      tooltip: "Color Picker's tooltip text.",
+      getFunc: { __luaFn: true, code: "function() return 1, 0, 0, 1 end" },
+      setFunc: { __luaFn: true, code: "function(r,g,b,a) print(r, g, b, a) end" },
+      width: "full",
+      warning: "warning text",
+    },
+    {
+      type: "button",
+      name: "My Button",
+      tooltip: "Button's tooltip text.",
+      func: { __luaFn: true, code: "function() d(\"button pressed!\") end" },
+      width: "full",
+      warning: "Will need to reload the UI.",
+    },
+    {
+      type: "header",
+      name: "My Second Header",
+      width: "full",
+    },
+    {
+      type: "description",
+      title: null,
+      text: "This is my second section containing only half widths.",
+      width: "full",
+    },
+    {
+      type: "checkbox",
+      name: "My Checkbox",
+      tooltip: "Checkbox's tooltip text.",
+      getFunc: { __luaFn: true, code: "function() return true end" },
+      setFunc: { __luaFn: true, code: "function(value) d(value) end" },
+      width: "half",
+      warning: "Will need to reload the UI.",
     },
     {
       type: "dropdown",
@@ -62,62 +130,21 @@ const sampleTemplate = {
       default: 5,
     },
     {
+      type: "colorpicker",
+      name: "My Color Picker",
+      tooltip: "Color Picker's tooltip text.",
+      getFunc: { __luaFn: true, code: "function() return 1, 0, 0, 1 end" },
+      setFunc: { __luaFn: true, code: "function(r,g,b,a) print(r, g, b, a) end" },
+      width: "half",
+      warning: "warning text",
+    },
+    {
       type: "button",
       name: "My Button",
       tooltip: "Button's tooltip text.",
       func: { __luaFn: true, code: "function() d(\"button pressed!\") end" },
       width: "half",
       warning: "Will need to reload the UI.",
-    },
-    {
-      type: "submenu",
-      name: "Submenu Title",
-      tooltip: "My submenu tooltip",
-      controls: [
-        {
-          type: "checkbox",
-          name: "My Checkbox",
-          tooltip: "Checkbox's tooltip text.",
-          getFunc: { __luaFn: true, code: "function() return true end" },
-          setFunc: { __luaFn: true, code: "function(value) d(value) end" },
-          width: "half",
-          warning: "Will need to reload the UI.",
-        },
-        {
-          type: "colorpicker",
-          name: "My Color Picker",
-          tooltip: "Color Picker's tooltip text.",
-          getFunc: { __luaFn: true, code: "function() return 1, 0, 0, 1 end" },
-          setFunc: { __luaFn: true, code: "function(r,g,b,a) print(r, g, b, a) end" },
-          width: "half",
-          warning: "warning text",
-        },
-        {
-          type: "editbox",
-          name: "My Editbox",
-          tooltip: "Editbox's tooltip text.",
-          getFunc: { __luaFn: true, code: "function() return \"this is some text\" end" },
-          setFunc: { __luaFn: true, code: "function(text) print(text) end" },
-          isMultiline: false,
-          width: "half",
-          warning: "Will need to reload the UI.",
-          default: "",
-        },
-      ],
-    },
-    {
-      type: "custom",
-      reference: "MyAddonCustomControl",
-      refreshFunc: { __luaFn: true, code: "function(customControl) end" },
-      width: "half",
-    },
-    {
-      type: "texture",
-      image: "EsoUI\\Art\\ActionBar\\abilityframe64_up.dds",
-      imageWidth: 64,
-      imageHeight: 64,
-      tooltip: "Image's tooltip text.",
-      width: "half",
     },
   ],
 };
@@ -134,9 +161,10 @@ function deepClone(obj) {
 // App functions
 /////////////////////
 function addPanelData() {
-  // Create a new default panelData object
+  // Create a new default panelData object with all required fields
   panelData = {
-    name: "My Addon",
+    type: "panel",
+    name: "MyAddon",
     displayName: "My Addon Settings",
     author: "AuthorName",
     version: "1.0",
@@ -145,113 +173,116 @@ function addPanelData() {
     registerForDefaults: true,
   };
 
-  editPanelData = true;           // enable editing
-  selectedIndex = null;           // deselect any element
+  editPanelData = true;
   renderUI();
 }
 
-function addOption() {
-  // Define templates for each type with all available fields
-  const templates = {
-    checkbox: {
-      type: "checkbox",
-      name: "New Checkbox",
-      tooltip: "",
-      getFunc: { __luaFn: true, code: "function() return true end" },
-      setFunc: { __luaFn: true, code: "function(value) d(value) end" },
-      width: "",
-      warning: "",
-      default: ""
-    },
-    slider: {
-      type: "slider",
-      name: "New Slider",
-      tooltip: "",
-      min: "",
-      max: "",
-      step: "",
-      getFunc: { __luaFn: true, code: "function() return 0 end" },
-      setFunc: { __luaFn: true, code: "function(value) d(value) end" },
-      width: "",
-      warning: "",
-      default: ""
-    },
-    dropdown: {
-      type: "dropdown",
-      name: "New Dropdown",
-      tooltip: "",
-      choices: [],
-      getFunc: { __luaFn: true, code: "function() return \"\" end" },
-      setFunc: { __luaFn: true, code: "function(var) print(var) end" },
-      width: "",
-      warning: ""
-    },
-    description: {
-      type: "description",
-      title: "",
-      text: "Description text",
-      width: ""
-    },
-    header: {
-      type: "header",
-      name: "New Header",
-      width: ""
-    },
-    button: {
-      type: "button",
-      name: "New Button",
-      tooltip: "",
-      func: { __luaFn: true, code: "function() d(\"button pressed!\") end" },
-      width: "",
-      warning: ""
-    },
-    submenu: {
-      type: "submenu",
-      name: "New Submenu",
-      tooltip: "",
-      controls: [],
-      width: ""
-    },
-    editbox: {
-      type: "editbox",
-      name: "New Editbox",
-      tooltip: "",
-      getFunc: { __luaFn: true, code: "function() return \"\" end" },
-      setFunc: { __luaFn: true, code: "function(text) print(text) end" },
-      isMultiline: "",
-      width: "",
-      warning: "",
-      default: ""
-    },
-    colorpicker: {
-      type: "colorpicker",
-      name: "New Color Picker",
-      tooltip: "",
-      getFunc: { __luaFn: true, code: "function() return 1, 0, 0, 1 end" },
-      setFunc: { __luaFn: true, code: "function(r,g,b,a) print(r, g, b, a) end" },
-      width: "",
-      warning: ""
-    },
-    custom: {
-      type: "custom",
-      reference: "",
-      refreshFunc: { __luaFn: true, code: "function(customControl) end" },
-      width: ""
-    },
-    texture: {
-      type: "texture",
-      image: "",
-      imageWidth: "",
-      imageHeight: "",
-      tooltip: "",
-      width: ""
-    }
+// Individual add functions for each object type
+function addHeader() {
+  const newObj = {
+    type: "header",
+    name: "New Header",
+    width: "full"
   };
-
-  const newObj = deepClone(templates.checkbox); // Default to checkbox
-
   objects.push(newObj);
-  selectedIndex = objects.length - 1;
+  renderUI();
+}
+
+function addDescription() {
+  const newObj = {
+    type: "description",
+    title: null,
+    text: "Description text",
+    width: "full"
+  };
+  objects.push(newObj);
+  renderUI();
+}
+
+function addCheckbox() {
+  const newObj = {
+    type: "checkbox",
+    name: "New Checkbox",
+    tooltip: "Checkbox tooltip",
+    getFunc: { __luaFn: true, code: "function() return true end" },
+    setFunc: { __luaFn: true, code: "function(value) d(value) end" },
+    width: "full",
+    warning: "",
+    default: true
+  };
+  objects.push(newObj);
+  renderUI();
+}
+
+function addSlider() {
+  const newObj = {
+    type: "slider",
+    name: "New Slider",
+    tooltip: "Slider tooltip",
+    min: 0,
+    max: 100,
+    step: 1,
+    getFunc: { __luaFn: true, code: "function() return 50 end" },
+    setFunc: { __luaFn: true, code: "function(value) d(value) end" },
+    width: "full",
+    warning: "",
+    default: 50
+  };
+  objects.push(newObj);
+  renderUI();
+}
+
+function addDropdown() {
+  const newObj = {
+    type: "dropdown",
+    name: "New Dropdown",
+    tooltip: "Dropdown tooltip",
+    choices: ["Option 1", "Option 2", "Option 3"],
+    getFunc: { __luaFn: true, code: "function() return \"Option 1\" end" },
+    setFunc: { __luaFn: true, code: "function(var) print(var) end" },
+    width: "full",
+    warning: ""
+  };
+  objects.push(newObj);
+  renderUI();
+}
+
+function addButton() {
+  const newObj = {
+    type: "button",
+    name: "New Button",
+    tooltip: "Button tooltip",
+    func: { __luaFn: true, code: "function() d(\"button pressed!\") end" },
+    width: "full",
+    warning: ""
+  };
+  objects.push(newObj);
+  renderUI();
+}
+
+function addSubmenu() {
+  const newObj = {
+    type: "submenu",
+    name: "New Submenu",
+    tooltip: "Submenu tooltip",
+    controls: [],
+    width: "full"
+  };
+  objects.push(newObj);
+  renderUI();
+}
+
+function addColorpicker() {
+  const newObj = {
+    type: "colorpicker",
+    name: "New Color Picker",
+    tooltip: "Color picker tooltip",
+    getFunc: { __luaFn: true, code: "function() return 1, 0, 0, 1 end" },
+    setFunc: { __luaFn: true, code: "function(r,g,b,a) print(r, g, b, a) end" },
+    width: "full",
+    warning: ""
+  };
+  objects.push(newObj);
   renderUI();
 }
 
@@ -382,10 +413,53 @@ if (addPanelBtn && !addPanelBtn.dataset.bound) {
 }
 
 
-const addBtn = document.getElementById("addOptionBtn");
-if (addBtn && !addBtn.dataset.bound) {
-  addBtn.onclick = addOption;
-  addBtn.dataset.bound = true;
+// Bind all the individual add buttons
+const addHeaderBtn = document.getElementById("addHeaderBtn");
+if (addHeaderBtn && !addHeaderBtn.dataset.bound) {
+  addHeaderBtn.onclick = addHeader;
+  addHeaderBtn.dataset.bound = true;
+}
+
+const addDescriptionBtn = document.getElementById("addDescriptionBtn");
+if (addDescriptionBtn && !addDescriptionBtn.dataset.bound) {
+  addDescriptionBtn.onclick = addDescription;
+  addDescriptionBtn.dataset.bound = true;
+}
+
+const addCheckboxBtn = document.getElementById("addCheckboxBtn");
+if (addCheckboxBtn && !addCheckboxBtn.dataset.bound) {
+  addCheckboxBtn.onclick = addCheckbox;
+  addCheckboxBtn.dataset.bound = true;
+}
+
+const addSliderBtn = document.getElementById("addSliderBtn");
+if (addSliderBtn && !addSliderBtn.dataset.bound) {
+  addSliderBtn.onclick = addSlider;
+  addSliderBtn.dataset.bound = true;
+}
+
+const addDropdownBtn = document.getElementById("addDropdownBtn");
+if (addDropdownBtn && !addDropdownBtn.dataset.bound) {
+  addDropdownBtn.onclick = addDropdown;
+  addDropdownBtn.dataset.bound = true;
+}
+
+const addButtonBtn = document.getElementById("addButtonBtn");
+if (addButtonBtn && !addButtonBtn.dataset.bound) {
+  addButtonBtn.onclick = addButton;
+  addButtonBtn.dataset.bound = true;
+}
+
+const addSubmenuBtn = document.getElementById("addSubmenuBtn");
+if (addSubmenuBtn && !addSubmenuBtn.dataset.bound) {
+  addSubmenuBtn.onclick = addSubmenu;
+  addSubmenuBtn.dataset.bound = true;
+}
+
+const addColorpickerBtn = document.getElementById("addColorpickerBtn");
+if (addColorpickerBtn && !addColorpickerBtn.dataset.bound) {
+  addColorpickerBtn.onclick = addColorpicker;
+  addColorpickerBtn.dataset.bound = true;
 }
 
 const sampleBtn = document.getElementById("sampleMenuBtn");
@@ -423,8 +497,7 @@ if (togglePreviewBtn && !togglePreviewBtn.dataset.bound) {
 /////////////////////
 function renderUI() {
   renderPanelDataEditor();
-  renderSidebar();
-  renderEditor();
+  renderObjectsContainer();
   renderPreview();
 }
 
@@ -433,37 +506,56 @@ function renderPanelDataEditor() {
   if (!panelEditor) return;
 
   if (!editPanelData || !panelData) {
-    panelEditor.innerHTML = `
-      <h3>Panel Data</h3>
-      <p>No panel data added. Click <strong>"Add Panel Data"</strong> to create one.</p>
-    `;
+    panelEditor.innerHTML = `<p>No panel data added. Use the "Add Panel" button to create one.</p>`;
     return;
   }
 
-  panelEditor.innerHTML = "<h3>Panel Data</h3>";
+  panelEditor.innerHTML = "";
+  
+  const panelSection = document.createElement("div");
+  panelSection.className = "object-section";
+  panelSection.innerHTML = `
+    <div class="object-header">
+      <h3>Panel Data (${panelData.name || "Unnamed Panel"})</h3>
+      <button class="delete-object-btn" onclick="deletePanelData()">Delete</button>
+    </div>
+    <div class="object-fields" id="panel-fields"></div>
+  `;
+  panelEditor.appendChild(panelSection);
+  
+  // Render panel data fields
+  renderPanelDataFields();
+}
 
-  for (const key of Object.keys(panelData)) {
+function renderPanelDataFields() {
+  const fieldsContainer = document.getElementById("panel-fields");
+  if (!fieldsContainer) return;
+  
+  fieldsContainer.innerHTML = "";
+  
+  // Render each field of the panel data
+  Object.keys(panelData).forEach(key => {
     const value = panelData[key];
-
-    const wrapper = document.createElement("div");
-    wrapper.style.display = "flex";
-    wrapper.style.alignItems = "center";
-    wrapper.style.gap = "8px";
-    wrapper.style.marginBottom = "4px";
-
+    const fieldDiv = document.createElement("div");
+    fieldDiv.className = "field-row";
+    
     const label = document.createElement("label");
-    label.textContent = key;
-    label.style.width = "150px";
-
-    // All fields are input fields
-    const input = document.createElement("input");
+    label.textContent = key + ":";
+    label.className = "field-label";
+    
+    let input = document.createElement("input");
+    input.className = "field-input";
+    
+    // Handle different value types
     if (typeof value === "boolean") {
+      input.type = "text";
       input.value = value ? "true" : "false";
       input.oninput = e => {
         panelData[key] = e.target.value === "true";
         renderPreview();
       };
     } else if (typeof value === "number") {
+      input.type = "number";
       input.value = value;
       input.oninput = e => {
         const n = parseFloat(e.target.value);
@@ -471,45 +563,146 @@ function renderPanelDataEditor() {
         renderPreview();
       };
     } else {
+      input.type = "text";
       input.value = value == null ? "" : value;
       input.oninput = e => {
         panelData[key] = e.target.value;
         renderPreview();
+        // Update header title if name changes
+        if (key === "name") {
+          const header = document.querySelector(".object-section h3");
+          if (header) {
+            header.textContent = `Panel Data (${e.target.value || "Unnamed Panel"})`;
+          }
+        }
       };
     }
-    input.style.flex = "1";
-
-    wrapper.appendChild(label);
-    wrapper.appendChild(input);
-    panelEditor.appendChild(wrapper);
-  }
-
-  const deleteBtn = document.createElement("button");
-  deleteBtn.textContent = "Delete Panel Data";
-  deleteBtn.style.marginTop = "10px";
-  deleteBtn.onclick = () => {
-    if (confirm("Are you sure you want to delete panel data?")) {
-      panelData = null;
-      editPanelData = false;
-      renderUI();
-    }
-  };
-
-  panelEditor.appendChild(deleteBtn);
+    
+    fieldDiv.appendChild(label);
+    fieldDiv.appendChild(input);
+    fieldsContainer.appendChild(fieldDiv);
+  });
 }
 
-function renderSidebar() {
-  const list = document.getElementById("optionsList");
-  if (!list) return;
-  list.innerHTML = "";
-  objects.forEach((obj, i) => {
-    const li = document.createElement("li");
-    li.textContent = `${i + 1}. ${obj.name || "Unnamed"} (${obj.type})`;
-    li.style.cursor = "pointer";
-    li.style.marginBottom = "5px";
-    li.onclick = () => selectObject(i);
-    if (i === selectedIndex) li.style.color = "#0f0";
-    list.appendChild(li);
+function deletePanelData() {
+  if (confirm("Are you sure you want to delete panel data?")) {
+    panelData = null;
+    editPanelData = false;
+    renderUI();
+  }
+}
+
+function renderObjectsContainer() {
+  const container = document.getElementById("objectsContainer");
+  if (!container) return;
+  
+  if (objects.length === 0) {
+    container.innerHTML = "<p>No objects added. Use the buttons on the left to add objects.</p>";
+    return;
+  }
+  
+  container.innerHTML = "";
+  
+  objects.forEach((obj, index) => {
+    const objectSection = document.createElement("div");
+    objectSection.className = "object-section";
+    objectSection.innerHTML = `
+      <div class="object-header">
+        <h3>${obj.name || "Unnamed"} (${obj.type})</h3>
+        <button class="delete-object-btn" onclick="removeObject(${index})">Delete</button>
+      </div>
+      <div class="object-fields" id="object-${index}"></div>
+    `;
+    container.appendChild(objectSection);
+    
+    // Render fields for this object
+    renderObjectFields(obj, index);
+  });
+}
+
+function renderObjectFields(obj, index) {
+  const fieldsContainer = document.getElementById(`object-${index}`);
+  if (!fieldsContainer) return;
+  
+  fieldsContainer.innerHTML = "";
+  
+  // Render each field of the object
+  Object.keys(obj).forEach(key => {
+    if (key === "type") return; // Skip type field
+    
+    const value = obj[key];
+    const fieldDiv = document.createElement("div");
+    fieldDiv.className = "field-row";
+    
+    const label = document.createElement("label");
+    label.textContent = key + ":";
+    label.className = "field-label";
+    
+    let input;
+    
+    // Function object editor (raw Lua)
+    if (value && typeof value === "object" && value.__luaFn) {
+      input = document.createElement("textarea");
+      input.value = value.code;
+      input.className = "field-textarea";
+      input.oninput = e => {
+        objects[index][key].code = e.target.value;
+        renderPreview();
+      };
+    }
+    // Arrays / Objects -> JSON editor
+    else if (Array.isArray(value) || (value && typeof value === "object")) {
+      input = document.createElement("textarea");
+      input.value = JSON.stringify(value, null, 2);
+      input.className = "field-textarea";
+      input.onblur = e => {
+        try {
+          const parsed = JSON.parse(e.target.value);
+          objects[index][key] = parsed;
+          renderPreview();
+        } catch (err) {
+          alert("Invalid JSON: " + err.message);
+        }
+      };
+    }
+    // Boolean values
+    else if (typeof value === "boolean") {
+      input = document.createElement("input");
+      input.type = "text";
+      input.value = value ? "true" : "false";
+      input.className = "field-input";
+      input.oninput = e => {
+        objects[index][key] = e.target.value === "true";
+        renderPreview();
+      };
+    }
+    // Number values
+    else if (typeof value === "number") {
+      input = document.createElement("input");
+      input.type = "number";
+      input.value = value;
+      input.className = "field-input";
+      input.oninput = e => {
+        const n = parseFloat(e.target.value);
+        objects[index][key] = isNaN(n) ? e.target.value : n;
+        renderPreview();
+      };
+    }
+    // String values
+    else {
+      input = document.createElement("input");
+      input.type = "text";
+      input.value = value == null ? "" : value;
+      input.className = "field-input";
+      input.oninput = e => {
+        objects[index][key] = e.target.value;
+        renderPreview();
+      };
+    }
+    
+    fieldDiv.appendChild(label);
+    fieldDiv.appendChild(input);
+    fieldsContainer.appendChild(fieldDiv);
   });
 }
 
@@ -540,7 +733,7 @@ function renderEditor() {
   const typeLabel = document.createElement("label");
   typeLabel.textContent = "Type:";
   const typeSelect = document.createElement("select");
-  ["checkbox", "slider", "dropdown", "description", "header", "button", "submenu", "custom", "texture", "editbox", "colorpicker"].forEach(t => {
+  ["checkbox", "slider", "dropdown", "description", "header", "button", "submenu", "colorpicker"].forEach(t => {
     const opt = document.createElement("option");
     opt.value = t;
     opt.textContent = t;
@@ -611,17 +804,6 @@ function renderEditor() {
         controls: [],
         width: ""
       },
-      editbox: {
-        type: "editbox",
-        name: obj.name || "New Editbox",
-        tooltip: "",
-        getFunc: { __luaFn: true, code: "function() return \"\" end" },
-        setFunc: { __luaFn: true, code: "function(text) print(text) end" },
-        isMultiline: "",
-        width: "",
-        warning: "",
-        default: ""
-      },
       colorpicker: {
         type: "colorpicker",
         name: obj.name || "New Color Picker",
@@ -630,20 +812,6 @@ function renderEditor() {
         setFunc: { __luaFn: true, code: "function(r,g,b,a) print(r, g, b, a) end" },
         width: "",
         warning: ""
-      },
-      custom: {
-        type: "custom",
-        reference: "",
-        refreshFunc: { __luaFn: true, code: "function(customControl) end" },
-        width: ""
-      },
-      texture: {
-        type: "texture",
-        image: "",
-        imageWidth: "",
-        imageHeight: "",
-        tooltip: "",
-        width: ""
       }
     };
 
@@ -770,18 +938,7 @@ function renderEditor() {
     addField(key, obj[key]);
   }
 
-  // Button to add a new blank property on this element
-  const addPropBtn = document.createElement("button");
-  addPropBtn.textContent = "Add Property";
-  addPropBtn.style.marginTop = "8px";
-  addPropBtn.onclick = () => {
-    const propName = prompt("Property name (key):");
-    if (!propName) return;
-    // default string value
-    objects[selectedIndex][propName] = "";
-    renderEditor();
-  };
-  editor.appendChild(addPropBtn);
+
 
   const removeBtn = document.createElement("button");
   removeBtn.textContent = "Delete Option";
@@ -795,142 +952,7 @@ function renderEditor() {
   editor.appendChild(removeBtn);
 }
 
-// Lua syntax highlighting function
-function highlightLuaCode(code) {
-  const lines = code.split('\n');
-  const lineNumbers = lines.map((_, i) => i + 1).join('\n');
 
-  // Simple tokenizer to avoid overlapping spans
-  function tokenizeLine(line) {
-    const tokens = [];
-    let i = 0;
-    
-    while (i < line.length) {
-      const char = line[i];
-      
-      // Skip whitespace
-      if (/\s/.test(char)) {
-        let whitespace = '';
-        while (i < line.length && /\s/.test(line[i])) {
-          whitespace += line[i];
-          i++;
-        }
-        tokens.push({ type: 'whitespace', value: whitespace });
-        continue;
-      }
-      
-      // Comments
-      if (char === '-' && line[i + 1] === '-') {
-        const comment = line.substring(i);
-        tokens.push({ type: 'comment', value: comment });
-        break; // Rest of line is comment
-      }
-      
-      // Strings
-      if (char === '"') {
-        let string = '"';
-        i++;
-        while (i < line.length && line[i] !== '"') {
-          if (line[i] === '\\' && i + 1 < line.length) {
-            string += line[i] + line[i + 1];
-            i += 2;
-          } else {
-            string += line[i];
-            i++;
-          }
-        }
-        if (i < line.length) {
-          string += '"';
-          i++;
-        }
-        tokens.push({ type: 'string', value: string });
-        continue;
-      }
-      
-      // Numbers
-      if (/\d/.test(char)) {
-        let number = '';
-        while (i < line.length && /[\d.]/.test(line[i])) {
-          number += line[i];
-          i++;
-        }
-        tokens.push({ type: 'number', value: number });
-        continue;
-      }
-      
-      // Identifiers and keywords
-      if (/[a-zA-Z_]/.test(char)) {
-        let identifier = '';
-        while (i < line.length && /[a-zA-Z0-9_]/.test(line[i])) {
-          identifier += line[i];
-          i++;
-        }
-        
-        const keywords = ['local', 'function', 'end', 'if', 'then', 'else', 'elseif', 'for', 'while', 'do', 'repeat', 'until', 'break', 'return', 'and', 'or', 'not', 'true', 'false', 'nil'];
-        const builtins = ['print', 'pairs', 'ipairs', 'next', 'type', 'tostring', 'tonumber', 'table', 'string', 'math'];
-        
-        if (keywords.includes(identifier)) {
-          tokens.push({ type: 'keyword', value: identifier });
-        } else if (builtins.includes(identifier)) {
-          tokens.push({ type: 'builtin', value: identifier });
-        } else {
-          tokens.push({ type: 'identifier', value: identifier });
-        }
-        continue;
-      }
-      
-      // Operators and brackets
-      if (/[+\-*/%^#=<>~]/.test(char)) {
-        tokens.push({ type: 'operator', value: char });
-        i++;
-        continue;
-      }
-      
-      if (/[{}[\]()]/.test(char)) {
-        tokens.push({ type: 'bracket', value: char });
-        i++;
-        continue;
-      }
-      
-      // Everything else
-      tokens.push({ type: 'other', value: char });
-      i++;
-    }
-    
-    return tokens;
-  }
-
-  // Process each line
-  const processedLines = lines.map(line => {
-    const tokens = tokenizeLine(line);
-    return tokens.map(token => {
-      const escapedValue = token.value
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-        
-      switch (token.type) {
-        case 'comment': return `<span class="lua-comment">${escapedValue}</span>`;
-        case 'string': return `<span class="lua-string">${escapedValue}</span>`;
-        case 'keyword': return `<span class="lua-keyword">${escapedValue}</span>`;
-        case 'number': return `<span class="lua-number">${escapedValue}</span>`;
-        case 'builtin': return `<span class="lua-builtin">${escapedValue}</span>`;
-        case 'operator': return `<span class="lua-operator">${escapedValue}</span>`;
-        case 'bracket': return `<span class="lua-bracket">${escapedValue}</span>`;
-        default: return escapedValue;
-      }
-    }).join('');
-  });
-
-  const highlightedCode = processedLines.join('\n');
-
-  return `
-    <div class="lua-code-container">
-      <div class="lua-line-numbers">${lineNumbers}</div>
-      <div class="lua-code-content">${highlightedCode}</div>
-    </div>
-  `;
-}
 
 function renderPreview() {
   const preview = document.getElementById("preview");
@@ -947,9 +969,7 @@ function renderPreview() {
     title.textContent = "Lua Preview";
     toggleBtn.textContent = "Switch to Live Preview";
 
-    const luaCode = exportToLua(objects, panelData);
-    const highlightedCode = highlightLuaCode(luaCode);
-    output.innerHTML = highlightedCode;
+    output.textContent = exportToLua(objects, panelData);
   } else {
     // Live Preview
     preview.classList.add("live");     // sets background image on outer div
@@ -958,57 +978,194 @@ function renderPreview() {
     toggleBtn.textContent = "Switch to Lua Preview";
 
     let html = "";
-    objects.forEach(obj => {
-      const name = obj.name || "(unnamed)";
-      const type = (obj.type || "unknown").toLowerCase();
 
-      html += `<div style="margin-bottom:8px;">`;
-      switch (type) {
-        case "checkbox":
-          html += `<label><input type="checkbox"> ${escapeHtml(name)}</label>`;
-          break;
-        case "slider":
-          const min = obj.min != null ? obj.min : 0;
-          const max = obj.max != null ? obj.max : 100;
-          const value = obj.default != null ? obj.default : Math.floor((min + max) / 2);
-          html += `<label>${escapeHtml(name)}</label><input type="range" min="${escapeHtml(min)}" max="${escapeHtml(max)}" value="${escapeHtml(value)}">`;
-          break;
-        case "dropdown":
-          html += `<label>${escapeHtml(name)}</label><select>`;
-          if (Array.isArray(obj.choices)) {
-            obj.choices.forEach(c => {
-              html += `<option>${escapeHtml(c)}</option>`;
-            });
-          } else {
-            html += `<option>Option 1</option><option>Option 2</option>`;
-          }
-          html += `</select>`;
-          break;
-        case "description":
-          html += `<p style="margin:0; font-style:italic;">${escapeHtml(obj.text || obj.name || "")}</p>`;
-          break;
-        case "header":
-          html += `<h3 style="margin: 8px 0;">${escapeHtml(name)}</h3>`;
-          break;
-        case "button":
-          html += `<button>${escapeHtml(name)}</button>`;
-          break;
-        case "submenu":
-          html += `<details><summary>${escapeHtml(name)}</summary>`;
-          if (Array.isArray(obj.controls)) {
-            obj.controls.forEach(c => {
-              html += `<div style="margin:6px 8px 6px 8px;">`;
-              html += `<small style="color:#999">${escapeHtml(c.type || "")}</small><br>`;
-              html += `${escapeHtml(c.name || "")}`;
-              html += `</div>`;
-            });
-          }
-          html += `</details>`;
-          break;
-        default:
-          html += `<label>${escapeHtml(name)}</label><input type="text" placeholder="${escapeHtml(type)}">`;
-          break;
+    // Add panel data if available
+    if (editPanelData && panelData) {
+      html += `<div class="live-panel-data">`;
+      html += `<div class="live-panel-header">${escapeHtml(panelData.displayName || panelData.name || "Addon Settings")}</div>`;
+      if (panelData.version) {
+        html += `<div class="live-panel-info">Version: ${escapeHtml(panelData.version)}</div>`;
       }
+      if (panelData.author) {
+        html += `<div class="live-panel-info">Author: ${escapeHtml(panelData.author)}</div>`;
+      }
+      html += `</div>`;
+    }
+
+    // Group objects by sections (header to header)
+    const sections = [];
+    let currentSection = { header: null, objects: [] };
+
+    objects.forEach(obj => {
+      if (obj.type === "header") {
+        // Start new section
+        if (currentSection.header || currentSection.objects.length > 0) {
+          sections.push(currentSection);
+        }
+        currentSection = { header: obj, objects: [] };
+      } else {
+        // Add to current section
+        currentSection.objects.push(obj);
+      }
+    });
+
+    // Add the last section
+    if (currentSection.header || currentSection.objects.length > 0) {
+      sections.push(currentSection);
+    }
+
+    // Render sections
+    sections.forEach((section, sectionIndex) => {
+      html += `<div class="live-object">`;
+
+      // No HR breaks - let sections flow naturally
+
+      // Add header if exists
+      if (section.header) {
+        html += `<h3>${escapeHtml(section.header.name || "Section")}</h3>`;
+      }
+
+      // Group objects by width for layout
+      const layoutGroups = [];
+      let currentRow = [];
+
+      section.objects.forEach(obj => {
+        const width = obj.width || "full";
+
+        if (width === "full") {
+          // Full width objects get their own row
+          if (currentRow.length > 0) {
+            layoutGroups.push(currentRow);
+            currentRow = [];
+          }
+          layoutGroups.push([obj]);
+        } else if (width === "half") {
+          // Half width objects can share rows
+          currentRow.push(obj);
+          if (currentRow.length >= 2) {
+            layoutGroups.push(currentRow);
+            currentRow = [];
+          }
+        } else {
+          // Default to full width for unknown widths
+          if (currentRow.length > 0) {
+            layoutGroups.push(currentRow);
+            currentRow = [];
+          }
+          layoutGroups.push([obj]);
+        }
+      });
+
+      // Add remaining objects in current row
+      if (currentRow.length > 0) {
+        layoutGroups.push(currentRow);
+      }
+
+      // Render layout groups
+      layoutGroups.forEach((group, groupIndex) => {
+        html += `<div class="live-controls-row">`;
+
+        group.forEach(obj => {
+          const name = obj.name || "(unnamed)";
+          const type = (obj.type || "unknown").toLowerCase();
+          const width = obj.width || "full";
+          const widthClass = width === "half" ? "live-control-half" : "live-control-full";
+
+          html += `<div class="${widthClass}">`;
+
+          function renderControl(obj, isFullWidth) {
+            const name = obj.name || "(unnamed)";
+            const type = (obj.type || "unknown").toLowerCase();
+
+            // For full width, separate label and control
+            if (isFullWidth) {
+              let controlHtml = '';
+
+              switch (type) {
+                case "checkbox":
+                  return `<span class="control-label">${escapeHtml(name)}</span><span class="control-input"><span class="checkbox-toggle">ON</span></span>`;
+                case "slider":
+                  const min = obj.min != null ? obj.min : 0;
+                  const max = obj.max != null ? obj.max : 100;
+                  const value = obj.default != null ? obj.default : Math.floor((min + max) / 2);
+                  return `<span class="control-label">${escapeHtml(name)}</span><span class="control-input eso-slider"><span class="slider-value">${min}</span><input type="range" min="${escapeHtml(min)}" max="${escapeHtml(max)}" value="${escapeHtml(value)}"><span class="slider-value">${max}</span></span>`;
+                case "dropdown":
+                  let dropdown = `<span class="control-label">${escapeHtml(name)}</span><span class="control-input"><select>`;
+                  if (Array.isArray(obj.choices)) {
+                    obj.choices.forEach(c => {
+                      dropdown += `<option>${escapeHtml(c)}</option>`;
+                    });
+                  } else {
+                    dropdown += `<option>Option 1</option><option>Option 2</option>`;
+                  }
+                  dropdown += `</select></span>`;
+                  return dropdown;
+                case "description":
+                  return `<p style="margin: 0;">${escapeHtml(obj.text || obj.name || "")}</p>`;
+                case "button":
+                  return `<span class="control-label">${escapeHtml(name)}</span><span class="control-input"><button>${escapeHtml(name)}</button></span>`;
+                case "submenu":
+                  let submenu = `<span class="control-label">${escapeHtml(name)}</span><span class="control-input"><details><summary>Expand</summary><div class="submenu-content">`;
+                  if (Array.isArray(obj.controls)) {
+                    obj.controls.forEach(c => {
+                      submenu += `<div style="margin-bottom: 10px;"><strong>${escapeHtml(c.name || "")}</strong> (${escapeHtml(c.type || "")})</div>`;
+                    });
+                  }
+                  submenu += `</div></details></span>`;
+                  return submenu;
+                case "colorpicker":
+                  return `<span class="control-label">${escapeHtml(name)}</span><span class="control-input"><input type="color" value="#ff0000"></span>`;
+                default:
+                  return `<span class="control-label">${escapeHtml(name)}</span><span class="control-input"><input type="text" placeholder="${escapeHtml(type)}"></span>`;
+              }
+            } else {
+              // For half width, keep compact layout
+              switch (type) {
+                case "checkbox":
+                  return `<label>${escapeHtml(name)} <input type="checkbox" checked></label>`;
+                case "slider":
+                  const min = obj.min != null ? obj.min : 0;
+                  const max = obj.max != null ? obj.max : 100;
+                  const value = obj.default != null ? obj.default : Math.floor((min + max) / 2);
+                  return `<label>${escapeHtml(name)}</label><input type="range" min="${escapeHtml(min)}" max="${escapeHtml(max)}" value="${escapeHtml(value)}">`;
+                case "dropdown":
+                  let dropdown = `<label>${escapeHtml(name)}</label><select>`;
+                  if (Array.isArray(obj.choices)) {
+                    obj.choices.forEach(c => {
+                      dropdown += `<option>${escapeHtml(c)}</option>`;
+                    });
+                  } else {
+                    dropdown += `<option>Option 1</option><option>Option 2</option>`;
+                  }
+                  dropdown += `</select>`;
+                  return dropdown;
+                case "description":
+                  return `<p>${escapeHtml(obj.text || obj.name || "")}</p>`;
+                case "button":
+                  return `<button>${escapeHtml(name)}</button>`;
+                case "submenu":
+                  let submenu = `<details><summary>${escapeHtml(name)}</summary><div class="submenu-content">`;
+                  if (Array.isArray(obj.controls)) {
+                    obj.controls.forEach(c => {
+                      submenu += `<div style="margin-bottom: 10px;"><strong>${escapeHtml(c.name || "")}</strong> (${escapeHtml(c.type || "")})</div>`;
+                    });
+                  }
+                  submenu += `</div></details>`;
+                  return submenu;
+                case "colorpicker":
+                  return `<label>${escapeHtml(name)}</label><input type="color" value="#ff0000">`;
+                default:
+                  return `<label>${escapeHtml(name)}</label><input type="text" placeholder="${escapeHtml(type)}">`;
+              }
+            }
+          }
+
+          html += renderControl(obj, width === "full");
+          html += `</div>`;
+        });
+
+        html += `</div>`;
+      });
 
       html += `</div>`;
     });
