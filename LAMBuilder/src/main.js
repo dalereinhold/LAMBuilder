@@ -1,6 +1,6 @@
 /* Combined app + ui + exporter for LAMBuilder
    Merges app.js, ui.js and exporter.js into a single small-file entrypoint.
-   Keeps global state (elements, selectedIndex, panelData), unifies exportToLua signature,
+   Keeps global state (objects, panelData), unifies exportToLua signature,
    and provides a small escaping/formatting helper for Lua output.
 */
 
@@ -8,12 +8,11 @@
 // Core app state
 /////////////////////
 let objects = [];
-let selectedIndex = null;
+
 let panelData = null;
 let editPanelData = false;
 
 /////////////////////
-// Sample data (converted from sample.lua)
 // Functions are stored as objects { __luaFn: true, code: "function(...) ... end" }
 // so they can be edited as raw Lua code and exported without quotes.
 const sampleTemplate = {
@@ -35,7 +34,6 @@ const sampleTemplate = {
     },
     {
       type: "description",
-      title: null,
       text: "This is my first section containing only full widths.",
       width: "full",
     },
@@ -46,7 +44,6 @@ const sampleTemplate = {
       getFunc: { __luaFn: true, code: "function() return true end" },
       setFunc: { __luaFn: true, code: "function(value) d(value) end" },
       width: "full",
-      warning: "Will need to reload the UI.",
     },
     {
       type: "dropdown",
@@ -56,7 +53,6 @@ const sampleTemplate = {
       getFunc: { __luaFn: true, code: "function() return \"of\" end" },
       setFunc: { __luaFn: true, code: "function(var) print(var) end" },
       width: "full",
-      warning: "Will need to reload the UI.",
     },
     {
       type: "slider",
@@ -77,7 +73,6 @@ const sampleTemplate = {
       getFunc: { __luaFn: true, code: "function() return 1, 0, 0, 1 end" },
       setFunc: { __luaFn: true, code: "function(r,g,b,a) print(r, g, b, a) end" },
       width: "full",
-      warning: "warning text",
     },
     {
       type: "button",
@@ -85,7 +80,6 @@ const sampleTemplate = {
       tooltip: "Button's tooltip text.",
       func: { __luaFn: true, code: "function() d(\"button pressed!\") end" },
       width: "full",
-      warning: "Will need to reload the UI.",
     },
     {
       type: "header",
@@ -94,7 +88,6 @@ const sampleTemplate = {
     },
     {
       type: "description",
-      title: null,
       text: "This is my second section containing only half widths.",
       width: "full",
     },
@@ -105,7 +98,6 @@ const sampleTemplate = {
       getFunc: { __luaFn: true, code: "function() return true end" },
       setFunc: { __luaFn: true, code: "function(value) d(value) end" },
       width: "half",
-      warning: "Will need to reload the UI.",
     },
     {
       type: "dropdown",
@@ -115,7 +107,6 @@ const sampleTemplate = {
       getFunc: { __luaFn: true, code: "function() return \"of\" end" },
       setFunc: { __luaFn: true, code: "function(var) print(var) end" },
       width: "half",
-      warning: "Will need to reload the UI.",
     },
     {
       type: "slider",
@@ -136,7 +127,6 @@ const sampleTemplate = {
       getFunc: { __luaFn: true, code: "function() return 1, 0, 0, 1 end" },
       setFunc: { __luaFn: true, code: "function(r,g,b,a) print(r, g, b, a) end" },
       width: "half",
-      warning: "warning text",
     },
     {
       type: "button",
@@ -144,7 +134,6 @@ const sampleTemplate = {
       tooltip: "Button's tooltip text.",
       func: { __luaFn: true, code: "function() d(\"button pressed!\") end" },
       width: "half",
-      warning: "Will need to reload the UI.",
     },
   ],
 };
@@ -191,7 +180,6 @@ function addHeader() {
 function addDescription() {
   const newObj = {
     type: "description",
-    title: null,
     text: "Description text",
     width: "full"
   };
@@ -207,7 +195,6 @@ function addCheckbox() {
     getFunc: { __luaFn: true, code: "function() return true end" },
     setFunc: { __luaFn: true, code: "function(value) d(value) end" },
     width: "full",
-    warning: "",
     default: true
   };
   objects.push(newObj);
@@ -225,7 +212,6 @@ function addSlider() {
     getFunc: { __luaFn: true, code: "function() return 50 end" },
     setFunc: { __luaFn: true, code: "function(value) d(value) end" },
     width: "full",
-    warning: "",
     default: 50
   };
   objects.push(newObj);
@@ -241,7 +227,6 @@ function addDropdown() {
     getFunc: { __luaFn: true, code: "function() return \"Option 1\" end" },
     setFunc: { __luaFn: true, code: "function(var) print(var) end" },
     width: "full",
-    warning: ""
   };
   objects.push(newObj);
   renderUI();
@@ -254,7 +239,6 @@ function addButton() {
     tooltip: "Button tooltip",
     func: { __luaFn: true, code: "function() d(\"button pressed!\") end" },
     width: "full",
-    warning: ""
   };
   objects.push(newObj);
   renderUI();
@@ -280,26 +264,15 @@ function addColorpicker() {
     getFunc: { __luaFn: true, code: "function() return 1, 0, 0, 1 end" },
     setFunc: { __luaFn: true, code: "function(r,g,b,a) print(r, g, b, a) end" },
     width: "full",
-    warning: ""
   };
   objects.push(newObj);
   renderUI();
 }
 
-function selectObject(index) {
-  selectedIndex = index;
-  renderUI();
-}
 
-function updateObjectProperty(key, value) {
-  if (selectedIndex === null) return;
-  objects[selectedIndex][key] = value;
-  renderPreview();
-}
 
 function removeObject(index) {
   objects.splice(index, 1);
-  if (selectedIndex === index) selectedIndex = null;
   renderUI();
 }
 
@@ -308,7 +281,7 @@ function loadSampleMenu() {
   panelData = clone.panelData;
   objects = clone.optionsTable;
   editPanelData = true;
-  selectedIndex = null;
+
   renderUI();
 }
 
@@ -511,7 +484,7 @@ function renderPanelDataEditor() {
   }
 
   panelEditor.innerHTML = "";
-  
+
   const panelSection = document.createElement("div");
   panelSection.className = "object-section";
   panelSection.innerHTML = `
@@ -522,7 +495,7 @@ function renderPanelDataEditor() {
     <div class="object-fields" id="panel-fields"></div>
   `;
   panelEditor.appendChild(panelSection);
-  
+
   // Render panel data fields
   renderPanelDataFields();
 }
@@ -530,22 +503,22 @@ function renderPanelDataEditor() {
 function renderPanelDataFields() {
   const fieldsContainer = document.getElementById("panel-fields");
   if (!fieldsContainer) return;
-  
+
   fieldsContainer.innerHTML = "";
-  
+
   // Render each field of the panel data
   Object.keys(panelData).forEach(key => {
     const value = panelData[key];
     const fieldDiv = document.createElement("div");
     fieldDiv.className = "field-row";
-    
+
     const label = document.createElement("label");
     label.textContent = key + ":";
     label.className = "field-label";
-    
+
     let input = document.createElement("input");
     input.className = "field-input";
-    
+
     // Handle different value types
     if (typeof value === "boolean") {
       input.type = "text";
@@ -577,7 +550,7 @@ function renderPanelDataFields() {
         }
       };
     }
-    
+
     fieldDiv.appendChild(label);
     fieldDiv.appendChild(input);
     fieldsContainer.appendChild(fieldDiv);
@@ -595,14 +568,14 @@ function deletePanelData() {
 function renderObjectsContainer() {
   const container = document.getElementById("objectsContainer");
   if (!container) return;
-  
+
   if (objects.length === 0) {
     container.innerHTML = "<p>No objects added. Use the buttons on the left to add objects.</p>";
     return;
   }
-  
+
   container.innerHTML = "";
-  
+
   objects.forEach((obj, index) => {
     const objectSection = document.createElement("div");
     objectSection.className = "object-section";
@@ -614,7 +587,7 @@ function renderObjectsContainer() {
       <div class="object-fields" id="object-${index}"></div>
     `;
     container.appendChild(objectSection);
-    
+
     // Render fields for this object
     renderObjectFields(obj, index);
   });
@@ -623,23 +596,23 @@ function renderObjectsContainer() {
 function renderObjectFields(obj, index) {
   const fieldsContainer = document.getElementById(`object-${index}`);
   if (!fieldsContainer) return;
-  
+
   fieldsContainer.innerHTML = "";
-  
+
   // Render each field of the object
   Object.keys(obj).forEach(key => {
     if (key === "type") return; // Skip type field
-    
+
     const value = obj[key];
     const fieldDiv = document.createElement("div");
     fieldDiv.className = "field-row";
-    
+
     const label = document.createElement("label");
     label.textContent = key + ":";
     label.className = "field-label";
-    
+
     let input;
-    
+
     // Function object editor (raw Lua)
     if (value && typeof value === "object" && value.__luaFn) {
       input = document.createElement("textarea");
@@ -699,257 +672,11 @@ function renderObjectFields(obj, index) {
         renderPreview();
       };
     }
-    
+
     fieldDiv.appendChild(label);
     fieldDiv.appendChild(input);
     fieldsContainer.appendChild(fieldDiv);
   });
-}
-
-function renderEditor() {
-  const editor = document.getElementById("propertyEditor");
-  if (!editor) return;
-
-  if (!objects.length) {
-    editor.innerHTML = `
-      <h3>Options Properties</h3>
-      <p>No options added. Click <strong>"Add Option"</strong> to create one.</p>
-    `;
-    return;
-  }
-
-  if (selectedIndex === null) {
-    editor.innerHTML = `
-      <h3>Options Properties</h3>
-      <p>Select an option from the list to edit its properties.</p>
-    `;
-    return;
-  }
-
-  const obj = objects[selectedIndex];
-  editor.innerHTML = "<h3>Options Properties</h3>";
-
-  // Type selector (keep common choices, but user can edit raw type below)
-  const typeLabel = document.createElement("label");
-  typeLabel.textContent = "Type:";
-  const typeSelect = document.createElement("select");
-  ["checkbox", "slider", "dropdown", "description", "header", "button", "submenu", "colorpicker"].forEach(t => {
-    const opt = document.createElement("option");
-    opt.value = t;
-    opt.textContent = t;
-    if (obj.type === t) opt.selected = true;
-    typeSelect.appendChild(opt);
-  });
-  typeSelect.onchange = e => {
-    const newType = e.target.value;
-
-    // Define templates for each type with all available fields
-    const templates = {
-      checkbox: {
-        type: "checkbox",
-        name: obj.name || "New Checkbox",
-        tooltip: "",
-        getFunc: { __luaFn: true, code: "function() return true end" },
-        setFunc: { __luaFn: true, code: "function(value) d(value) end" },
-        width: "",
-        warning: "",
-        default: ""
-      },
-      slider: {
-        type: "slider",
-        name: obj.name || "New Slider",
-        tooltip: "",
-        min: "",
-        max: "",
-        step: "",
-        getFunc: { __luaFn: true, code: "function() return 0 end" },
-        setFunc: { __luaFn: true, code: "function(value) d(value) end" },
-        width: "",
-        warning: "",
-        default: ""
-      },
-      dropdown: {
-        type: "dropdown",
-        name: obj.name || "New Dropdown",
-        tooltip: "",
-        choices: [],
-        getFunc: { __luaFn: true, code: "function() return \"\" end" },
-        setFunc: { __luaFn: true, code: "function(var) print(var) end" },
-        width: "",
-        warning: ""
-      },
-      description: {
-        type: "description",
-        title: "",
-        text: "Description text",
-        width: ""
-      },
-      header: {
-        type: "header",
-        name: obj.name || "New Header",
-        width: ""
-      },
-      button: {
-        type: "button",
-        name: obj.name || "New Button",
-        tooltip: "",
-        func: { __luaFn: true, code: "function() d(\"button pressed!\") end" },
-        width: "",
-        warning: ""
-      },
-      submenu: {
-        type: "submenu",
-        name: obj.name || "New Submenu",
-        tooltip: "",
-        controls: [],
-        width: ""
-      },
-      colorpicker: {
-        type: "colorpicker",
-        name: obj.name || "New Color Picker",
-        tooltip: "",
-        getFunc: { __luaFn: true, code: "function() return 1, 0, 0, 1 end" },
-        setFunc: { __luaFn: true, code: "function(r,g,b,a) print(r, g, b, a) end" },
-        width: "",
-        warning: ""
-      }
-    };
-
-    // Replace the current object with the template for the new type
-    if (templates[newType]) {
-      objects[selectedIndex] = deepClone(templates[newType]);
-    } else {
-      updateObjectProperty("type", newType);
-    }
-
-    renderEditor(); // re-render to reflect fields
-    renderSidebar(); // update sidebar to show new name
-  };
-
-  const typeRow = document.createElement("div");
-  typeRow.style.display = "flex";
-  typeRow.style.alignItems = "center";
-  typeRow.style.gap = "8px";
-  typeRow.style.marginBottom = "6px";
-  typeRow.appendChild(typeLabel);
-  typeRow.appendChild(typeSelect);
-  editor.appendChild(typeRow);
-
-  // Generic editor: iterate all keys on the element and provide appropriate input
-  function addField(key, value) {
-    const wrapper = document.createElement("div");
-    wrapper.style.display = "flex";
-    wrapper.style.alignItems = "center";
-    wrapper.style.gap = "8px";
-    wrapper.style.marginBottom = "6px";
-
-    const label = document.createElement("label");
-    label.textContent = key + ":";
-    label.style.width = "150px";
-
-    // Function object editor (raw Lua)
-    if (value && typeof value === "object" && value.__luaFn) {
-      const ta = document.createElement("textarea");
-      ta.value = value.code;
-      ta.style.width = "100%";
-      ta.style.height = "70px";
-      ta.oninput = e => {
-        objects[selectedIndex][key].code = e.target.value;
-        renderPreview();
-      };
-      wrapper.appendChild(label);
-      wrapper.appendChild(ta);
-      editor.appendChild(wrapper);
-      return;
-    }
-
-    // Arrays / Objects -> JSON editor textarea
-    if (Array.isArray(value) || (value && typeof value === "object")) {
-      const ta = document.createElement("textarea");
-      try {
-        ta.value = JSON.stringify(value, null, 2);
-      } catch {
-        ta.value = String(value);
-      }
-      ta.style.width = "100%";
-      ta.style.height = "90px";
-      ta.onblur = e => {
-        try {
-          const parsed = JSON.parse(e.target.value);
-          objects[selectedIndex][key] = parsed;
-          renderPreview();
-          renderSidebar();
-        } catch (err) {
-          alert("Invalid JSON: " + err.message);
-          // keep old value
-        }
-      };
-      wrapper.appendChild(label);
-      wrapper.appendChild(ta);
-
-      // If this is controls (submenu), add a quick helper to open nested editor by selecting the item
-      if (key === "controls") {
-        const hint = document.createElement("div");
-        hint.innerHTML = `<small style="display:block;margin-left:150px;color:#888">You can edit nested controls as JSON or edit each control by selecting it in the sidebar (they will appear after loading sample or adding them manually).</small>`;
-        editor.appendChild(wrapper);
-        editor.appendChild(hint);
-        return;
-      }
-
-      editor.appendChild(wrapper);
-      return;
-    }
-
-    // All fields are input fields
-    const inp = document.createElement("input");
-    inp.type = "text";
-    if (typeof value === "boolean") {
-      inp.value = value ? "true" : "false";
-      inp.oninput = e => {
-        objects[selectedIndex][key] = e.target.value === "true";
-        renderPreview();
-        renderSidebar();
-      };
-    } else if (typeof value === "number") {
-      inp.value = String(value);
-      inp.oninput = e => {
-        const n = parseFloat(e.target.value);
-        objects[selectedIndex][key] = isNaN(n) ? e.target.value : n;
-        renderPreview();
-        renderSidebar();
-      };
-    } else {
-      inp.value = value == null ? "" : value;
-      inp.oninput = e => {
-        objects[selectedIndex][key] = e.target.value;
-        renderPreview();
-        renderSidebar();
-      };
-    }
-    inp.style.flex = "1";
-    wrapper.appendChild(label);
-    wrapper.appendChild(inp);
-    editor.appendChild(wrapper);
-  }
-
-  // Render every property of the object (except type which is handled by dropdown)
-  for (const key of Object.keys(obj)) {
-    if (key === "type") continue; // Skip type field since it's handled by dropdown
-    addField(key, obj[key]);
-  }
-
-
-
-  const removeBtn = document.createElement("button");
-  removeBtn.textContent = "Delete Option";
-  removeBtn.onclick = () => {
-    if (confirm("Delete this option?")) {
-      removeObject(selectedIndex);
-    }
-  };
-  removeBtn.style.marginTop = "10px";
-  removeBtn.style.marginLeft = "8px";
-  editor.appendChild(removeBtn);
 }
 
 
@@ -1173,7 +900,6 @@ function renderPreview() {
     output.innerHTML = html || "<em>No objects to preview</em>";
   }
 }
-
 
 // small helper to avoid injecting unescaped text into live preview labels/placeholders
 function escapeHtml(str) {
