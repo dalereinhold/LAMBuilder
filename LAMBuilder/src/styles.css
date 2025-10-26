@@ -13,6 +13,18 @@ body {
   overflow-y: auto;
 }
 
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  color: #eee;
+}
+
 #sidebar button {
   width: 100%;
   padding: 8px;
@@ -26,6 +38,18 @@ body {
   overflow-y: auto;
 }
 
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.editor-header h2 {
+  margin: 0;
+  color: #333;
+}
+
 #preview {
   position: relative;
   width: 100%;
@@ -34,12 +58,8 @@ body {
   overflow: auto;
   display: flex;
   flex-direction: column;
-
-  /* Default Lua Preview: green on black */
-  background: #000;
-  color: #0f0;
-  font-family: monospace;
   padding: 10px;
+  background: #272822;
 }
 
 .preview-header {
@@ -51,7 +71,7 @@ body {
 
 .preview-header h2 {
   margin: 0;
-  color: #0f0;
+  color: #fff;
 }
 
 #preview.live .preview-header h2 {
@@ -69,11 +89,6 @@ body {
 #previewOutput {
   flex: 1;
   overflow: auto;
-  white-space: pre;
-  background: #000;
-  color: #0f0;
-  font-family: monospace;
-  padding: 10px;
 }
 
 /* Live Preview inner controls over overlay */
@@ -145,8 +160,6 @@ body {
   flex: 1 1 calc(50% - 7.5px);
   min-width: 250px;
 }
-
-
 
 #previewOutput.live .live-object label {
   display: block;
@@ -227,8 +240,6 @@ body {
   background: rgba(150, 150, 150, 0.7);
 }
 
-
-
 #previewOutput.live .live-object h3 {
   margin: 0 0 20px 0;
   color: #fff;
@@ -264,8 +275,6 @@ body {
 .live-control-half {
   margin-bottom: 10px;
 }
-
-
 
 /* ESO-style sliders */
 .eso-slider {
@@ -344,7 +353,9 @@ select {
 
 .checkbox-toggle:hover {
   background: rgba(100, 150, 200, 0.5);
-}/* 
+}
+
+/* 
 Object sections in editor */
 .object-section {
   background: #fff;

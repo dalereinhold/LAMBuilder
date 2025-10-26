@@ -5,12 +5,15 @@
   <meta charset="UTF-8">
   <title>LAM Builder</title>
   <link rel="stylesheet" href="src/styles.css">
+  <link rel="stylesheet" href="src/prism.css">
 </head>
 
 <body>
 
   <div id="sidebar">
-    <h2>LAM Builder</h2>
+    <div class="sidebar-header">
+      <h2>LAM Builder</h2>
+    </div>
     <button id="sampleMenuBtn">Sample Menu</button>
     <button id="addPanelDataBtn">Add Panel</button>
     <button id="addHeaderBtn">Add Header</button>
@@ -24,11 +27,13 @@
   </div>
 
   <div id="editor">
-    <h2>Settings Panel</h2>
-    <div id="panelDataEditor"></div>
-    <div id="objectsContainer">
-      <p>No objects added. Use the buttons on the left to add objects.</p>
+    <div class="editor-header">
+      <h2>Settings Panel</h2>
     </div>
+      <div id="panelDataEditor"></div>
+      <div id="objectsContainer">
+        <p>No objects added. Use the buttons on the left to add objects.</p>
+      </div>
   </div>
 
   <div id="preview">
@@ -42,6 +47,7 @@
     <div id="previewOutput" class="preview-box"></div>
   </div>
 
+  <script src="src/prism.js"></script>
   <script src="src/main.js"></script>
 </body>
 

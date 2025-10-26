@@ -506,8 +506,9 @@ function renderPanelDataFields() {
 
   fieldsContainer.innerHTML = "";
 
-  // Render each field of the panel data
+  // Render each field of the panel data (except type)
   Object.keys(panelData).forEach(key => {
+    if (key === "type") return; // Skip type field - not editable
     const value = panelData[key];
     const fieldDiv = document.createElement("div");
     fieldDiv.className = "field-row";
@@ -581,7 +582,7 @@ function renderObjectsContainer() {
     objectSection.className = "object-section";
     objectSection.innerHTML = `
       <div class="object-header">
-        <h3>${obj.name || "Unnamed"} (${obj.type})</h3>
+        <h3>${obj.type.charAt(0).toUpperCase() + obj.type.slice(1)} (${obj.name || "Unnamed"})</h3>
         <button class="delete-object-btn" onclick="removeObject(${index})">Delete</button>
       </div>
       <div class="object-fields" id="object-${index}"></div>
@@ -599,9 +600,9 @@ function renderObjectFields(obj, index) {
 
   fieldsContainer.innerHTML = "";
 
-  // Render each field of the object
+  // Render each field of the object (except type)
   Object.keys(obj).forEach(key => {
-    if (key === "type") return; // Skip type field
+    if (key === "type") return; // Skip type field - not editable
 
     const value = obj[key];
     const fieldDiv = document.createElement("div");
@@ -670,6 +671,13 @@ function renderObjectFields(obj, index) {
       input.oninput = e => {
         objects[index][key] = e.target.value;
         renderPreview();
+        // Update header title if name changes
+        if (key === "name") {
+          const header = document.querySelector(`#object-${index}`).parentElement.querySelector("h3");
+          if (header) {
+            header.textContent = `${objects[index].type.charAt(0).toUpperCase() + objects[index].type.slice(1)} (${e.target.value || "Unnamed"})`;
+          }
+        }
       };
     }
 
@@ -696,7 +704,13 @@ function renderPreview() {
     title.textContent = "Lua Preview";
     toggleBtn.textContent = "Switch to Live Preview";
 
-    output.textContent = exportToLua(objects, panelData);
+    const luaCode = exportToLua(objects, panelData);
+    output.innerHTML = `<pre><code class="language-lua">${escapeHtml(luaCode)}</code></pre>`;
+
+    // Apply Prism syntax highlighting
+    if (typeof Prism !== 'undefined') {
+      Prism.highlightAllUnder(output);
+    }
   } else {
     // Live Preview
     preview.classList.add("live");     // sets background image on outer div
