@@ -1,14 +1,7 @@
-/* Combined app + ui + exporter for LAMBuilder
-   Merges app.js, ui.js and exporter.js into a single small-file entrypoint.
-   Keeps global state (objects, panelData), unifies exportToLua signature,
-   and provides a small escaping/formatting helper for Lua output.
-*/
-
 /////////////////////
 // Core app state
 /////////////////////
 let objects = [];
-
 let panelData = null;
 let editPanelData = false;
 
@@ -269,8 +262,6 @@ function addColorpicker() {
   renderUI();
 }
 
-
-
 function removeObject(index) {
   objects.splice(index, 1);
   renderUI();
@@ -409,7 +400,6 @@ if (clearMenuBtn && !clearMenuBtn.dataset.bound) {
   clearMenuBtn.dataset.bound = true;
 }
 
-
 // Bind all the individual add buttons
 const addHeaderBtn = document.getElementById("addHeaderBtn");
 if (addHeaderBtn && !addHeaderBtn.dataset.bound) {
@@ -500,10 +490,6 @@ if (downloadBtn && !downloadBtn.dataset.bound) {
   };
   downloadBtn.dataset.bound = true;
 }
-
-
-
-
 
 /////////////////////
 // Rendering
@@ -772,8 +758,6 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
-
-
 
 // Initial render
 renderUI();
