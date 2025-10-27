@@ -276,6 +276,24 @@ function removeObject(index) {
   renderUI();
 }
 
+function moveObjectUp(index) {
+  if (index > 0) {
+    const temp = objects[index];
+    objects[index] = objects[index - 1];
+    objects[index - 1] = temp;
+    renderUI();
+  }
+}
+
+function moveObjectDown(index) {
+  if (index < objects.length - 1) {
+    const temp = objects[index];
+    objects[index] = objects[index + 1];
+    objects[index + 1] = temp;
+    renderUI();
+  }
+}
+
 function loadSampleMenu() {
   const clone = deepClone(sampleTemplate);
   panelData = clone.panelData;
@@ -454,22 +472,38 @@ if (sampleBtn && !sampleBtn.dataset.bound) {
 const copyBtn = document.getElementById("copyBtn");
 if (copyBtn && !copyBtn.dataset.bound) {
   copyBtn.onclick = () => {
-    navigator.clipboard.writeText(exportToLua(objects, panelData));
-    alert("Lua copied to clipboard!");
+    const luaCode = exportToLua(objects, panelData);
+    navigator.clipboard.writeText(luaCode).then(() => {
+      alert("Lua code copied to clipboard!");
+    }).catch(() => {
+      alert("Failed to copy to clipboard. Please try again.");
+    });
   };
   copyBtn.dataset.bound = true;
 }
 
-let currentPreview = "lua";
-
-const togglePreviewBtn = document.getElementById("togglePreviewBtn");
-if (togglePreviewBtn && !togglePreviewBtn.dataset.bound) {
-  togglePreviewBtn.onclick = () => {
-    currentPreview = currentPreview === "lua" ? "live" : "lua";
-    renderPreview();
+const downloadBtn = document.getElementById("downloadBtn");
+if (downloadBtn && !downloadBtn.dataset.bound) {
+  downloadBtn.onclick = () => {
+    const luaCode = exportToLua(objects, panelData);
+    const filename = (panelData && panelData.name ? panelData.name : 'addon') + '.lua';
+    const blob = new Blob([luaCode], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
-  togglePreviewBtn.dataset.bound = true;
+  downloadBtn.dataset.bound = true;
 }
+
+
+
+
 
 /////////////////////
 // Rendering
@@ -595,10 +629,22 @@ function renderObjectsContainer() {
   objects.forEach((obj, index) => {
     const objectSection = document.createElement("div");
     objectSection.className = "object-section";
+    
+    // Create move buttons HTML
+    const moveButtonsHtml = `
+      <div class="move-buttons">
+        <button class="move-btn" onclick="moveObjectUp(${index})" ${index === 0 ? 'disabled' : ''} title="Move Up">↑</button>
+        <button class="move-btn" onclick="moveObjectDown(${index})" ${index === objects.length - 1 ? 'disabled' : ''} title="Move Down">↓</button>
+      </div>
+    `;
+    
     objectSection.innerHTML = `
       <div class="object-header">
         <h3>${obj.type.charAt(0).toUpperCase() + obj.type.slice(1)} (${obj.name || "Unnamed"})</h3>
-        <button class="delete-object-btn" onclick="removeObject(${index})">Delete</button>
+        <div class="object-controls">
+          ${moveButtonsHtml}
+          <button class="delete-object-btn" onclick="removeObject(${index})">Delete</button>
+        </div>
       </div>
       <div class="object-fields" id="object-${index}"></div>
     `;
@@ -703,228 +749,17 @@ function renderObjectFields(obj, index) {
 }
 
 function renderPreview() {
-  const preview = document.getElementById("preview");
-  const title = document.getElementById("previewTitle");
   const output = document.getElementById("previewOutput");
-  const toggleBtn = document.getElementById("togglePreviewBtn");
+  if (!output) return;
 
-  if (!preview || !output || !title || !toggleBtn) return;
+  const luaCode = exportToLua(objects, panelData);
+  
+  // Create simple code block with line numbers and syntax highlighting
+  output.innerHTML = `<pre class="line-numbers language-lua"><code class="language-lua">${escapeHtml(luaCode)}</code></pre>`;
 
-  if (currentPreview === "lua") {
-    // Lua Preview
-    preview.classList.remove("live");  // removes background image
-    output.classList.remove("live");
-    title.textContent = "Lua Preview";
-    toggleBtn.textContent = "Switch to Live Preview";
-
-    const luaCode = exportToLua(objects, panelData);
-    output.innerHTML = `<pre><code class="language-lua">${escapeHtml(luaCode)}</code></pre>`;
-
-    // Apply Prism syntax highlighting
-    if (typeof Prism !== 'undefined') {
-      Prism.highlightAllUnder(output);
-    }
-  } else {
-    // Live Preview
-    preview.classList.add("live");     // sets background image on outer div
-    output.classList.add("live");      // inner controls styling
-    title.textContent = "Live Preview";
-    toggleBtn.textContent = "Switch to Lua Preview";
-
-    let html = "";
-
-    // Add panel data if available
-    if (editPanelData && panelData) {
-      html += `<div class="live-panel-data">`;
-      html += `<div class="live-panel-header">${escapeHtml(panelData.displayName || panelData.name || "Addon Settings")}</div>`;
-      if (panelData.version) {
-        html += `<div class="live-panel-info">Version: ${escapeHtml(panelData.version)}</div>`;
-      }
-      if (panelData.author) {
-        html += `<div class="live-panel-info">Author: ${escapeHtml(panelData.author)}</div>`;
-      }
-      html += `</div>`;
-    }
-
-    // Group objects by sections (header to header)
-    const sections = [];
-    let currentSection = { header: null, objects: [] };
-
-    objects.forEach(obj => {
-      if (obj.type === "header") {
-        // Start new section
-        if (currentSection.header || currentSection.objects.length > 0) {
-          sections.push(currentSection);
-        }
-        currentSection = { header: obj, objects: [] };
-      } else {
-        // Add to current section
-        currentSection.objects.push(obj);
-      }
-    });
-
-    // Add the last section
-    if (currentSection.header || currentSection.objects.length > 0) {
-      sections.push(currentSection);
-    }
-
-    // Render sections
-    sections.forEach((section, sectionIndex) => {
-      html += `<div class="live-object">`;
-
-      // No HR breaks - let sections flow naturally
-
-      // Add header if exists
-      if (section.header) {
-        html += `<h3>${escapeHtml(section.header.name || "Section")}</h3>`;
-      }
-
-      // Group objects by width for layout
-      const layoutGroups = [];
-      let currentRow = [];
-
-      section.objects.forEach(obj => {
-        const width = obj.width || "full";
-
-        if (width === "full") {
-          // Full width objects get their own row
-          if (currentRow.length > 0) {
-            layoutGroups.push(currentRow);
-            currentRow = [];
-          }
-          layoutGroups.push([obj]);
-        } else if (width === "half") {
-          // Half width objects can share rows
-          currentRow.push(obj);
-          if (currentRow.length >= 2) {
-            layoutGroups.push(currentRow);
-            currentRow = [];
-          }
-        } else {
-          // Default to full width for unknown widths
-          if (currentRow.length > 0) {
-            layoutGroups.push(currentRow);
-            currentRow = [];
-          }
-          layoutGroups.push([obj]);
-        }
-      });
-
-      // Add remaining objects in current row
-      if (currentRow.length > 0) {
-        layoutGroups.push(currentRow);
-      }
-
-      // Render layout groups
-      layoutGroups.forEach((group, groupIndex) => {
-        html += `<div class="live-controls-row">`;
-
-        group.forEach(obj => {
-          const name = obj.name || "(unnamed)";
-          const type = (obj.type || "unknown").toLowerCase();
-          const width = obj.width || "full";
-          const widthClass = width === "half" ? "live-control-half" : "live-control-full";
-
-          html += `<div class="${widthClass}">`;
-
-          function renderControl(obj, isFullWidth) {
-            const name = obj.name || "(unnamed)";
-            const type = (obj.type || "unknown").toLowerCase();
-
-            // For full width, separate label and control
-            if (isFullWidth) {
-              let controlHtml = '';
-
-              switch (type) {
-                case "checkbox":
-                  return `<span class="control-label">${escapeHtml(name)}</span><span class="control-input"><span class="checkbox-toggle">ON</span></span>`;
-                case "slider":
-                  const min = obj.min != null ? obj.min : 0;
-                  const max = obj.max != null ? obj.max : 100;
-                  const value = obj.default != null ? obj.default : Math.floor((min + max) / 2);
-                  return `<span class="control-label">${escapeHtml(name)}</span><span class="control-input eso-slider"><span class="slider-value">${min}</span><input type="range" min="${escapeHtml(min)}" max="${escapeHtml(max)}" value="${escapeHtml(value)}"><span class="slider-value">${max}</span></span>`;
-                case "dropdown":
-                  let dropdown = `<span class="control-label">${escapeHtml(name)}</span><span class="control-input"><select>`;
-                  if (Array.isArray(obj.choices)) {
-                    obj.choices.forEach(c => {
-                      dropdown += `<option>${escapeHtml(c)}</option>`;
-                    });
-                  } else {
-                    dropdown += `<option>Option 1</option><option>Option 2</option>`;
-                  }
-                  dropdown += `</select></span>`;
-                  return dropdown;
-                case "description":
-                  return `<p style="margin: 0;">${escapeHtml(obj.text || obj.name || "")}</p>`;
-                case "button":
-                  return `<span class="control-label">${escapeHtml(name)}</span><span class="control-input"><button>${escapeHtml(name)}</button></span>`;
-                case "submenu":
-                  let submenu = `<span class="control-label">${escapeHtml(name)}</span><span class="control-input"><details><summary>Expand</summary><div class="submenu-content">`;
-                  if (Array.isArray(obj.controls)) {
-                    obj.controls.forEach(c => {
-                      submenu += `<div style="margin-bottom: 10px;"><strong>${escapeHtml(c.name || "")}</strong> (${escapeHtml(c.type || "")})</div>`;
-                    });
-                  }
-                  submenu += `</div></details></span>`;
-                  return submenu;
-                case "colorpicker":
-                  return `<span class="control-label">${escapeHtml(name)}</span><span class="control-input"><input type="color" value="#ff0000"></span>`;
-                default:
-                  return `<span class="control-label">${escapeHtml(name)}</span><span class="control-input"><input type="text" placeholder="${escapeHtml(type)}"></span>`;
-              }
-            } else {
-              // For half width, keep compact layout
-              switch (type) {
-                case "checkbox":
-                  return `<label>${escapeHtml(name)} <input type="checkbox" checked></label>`;
-                case "slider":
-                  const min = obj.min != null ? obj.min : 0;
-                  const max = obj.max != null ? obj.max : 100;
-                  const value = obj.default != null ? obj.default : Math.floor((min + max) / 2);
-                  return `<label>${escapeHtml(name)}</label><input type="range" min="${escapeHtml(min)}" max="${escapeHtml(max)}" value="${escapeHtml(value)}">`;
-                case "dropdown":
-                  let dropdown = `<label>${escapeHtml(name)}</label><select>`;
-                  if (Array.isArray(obj.choices)) {
-                    obj.choices.forEach(c => {
-                      dropdown += `<option>${escapeHtml(c)}</option>`;
-                    });
-                  } else {
-                    dropdown += `<option>Option 1</option><option>Option 2</option>`;
-                  }
-                  dropdown += `</select>`;
-                  return dropdown;
-                case "description":
-                  return `<p>${escapeHtml(obj.text || obj.name || "")}</p>`;
-                case "button":
-                  return `<button>${escapeHtml(name)}</button>`;
-                case "submenu":
-                  let submenu = `<details><summary>${escapeHtml(name)}</summary><div class="submenu-content">`;
-                  if (Array.isArray(obj.controls)) {
-                    obj.controls.forEach(c => {
-                      submenu += `<div style="margin-bottom: 10px;"><strong>${escapeHtml(c.name || "")}</strong> (${escapeHtml(c.type || "")})</div>`;
-                    });
-                  }
-                  submenu += `</div></details>`;
-                  return submenu;
-                case "colorpicker":
-                  return `<label>${escapeHtml(name)}</label><input type="color" value="#ff0000">`;
-                default:
-                  return `<label>${escapeHtml(name)}</label><input type="text" placeholder="${escapeHtml(type)}">`;
-              }
-            }
-          }
-
-          html += renderControl(obj, width === "full");
-          html += `</div>`;
-        });
-
-        html += `</div>`;
-      });
-
-      html += `</div>`;
-    });
-
-    output.innerHTML = html || "<em>No objects to preview</em>";
+  // Apply Prism syntax highlighting
+  if (typeof Prism !== 'undefined') {
+    Prism.highlightAllUnder(output);
   }
 }
 
@@ -937,6 +772,8 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
+
+
 
 // Initial render
 renderUI();

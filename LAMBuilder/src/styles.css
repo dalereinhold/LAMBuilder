@@ -100,31 +100,10 @@ body {
   display: flex;
   flex-direction: column;
   padding: 10px;
-  background: #272822;
+  background: #f5f5f5;
 }
 
-.preview-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
 
-.preview-header h2 {
-  margin: 0;
-  color: #fff;
-}
-
-#preview.live .preview-header h2 {
-  color: #f5f5f5;
-}
-
-/* Live Preview active */
-#preview.live {
-  background: url('img/live_bg.jpg') center/cover no-repeat;
-  color: #f5f5f5;
-  /* live text color */
-}
 
 /* Inner preview output styling */
 #previewOutput {
@@ -132,238 +111,7 @@ body {
   overflow: auto;
 }
 
-/* Live Preview inner controls over overlay */
-#previewOutput.live {
-  font-family: system-ui;
-  background: transparent;
-  color: #f5f5f5;
-  padding: 20px;
-  max-width: 100%;
-  box-sizing: border-box;
-}
 
-/* Panel data container */
-.live-panel-data {
-  background: rgba(0, 0, 0, 0.8);
-  padding: 20px;
-  margin-bottom: 0;
-  border-radius: 0;
-  border: none;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
-}
-
-.live-panel-header {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 8px;
-  color: #fff;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.live-panel-info {
-  font-size: 12px;
-  color: #bbb;
-  margin-bottom: 3px;
-}
-
-/* Object containers */
-.live-object {
-  background: rgba(0, 0, 0, 0.8);
-  padding: 20px;
-  margin-bottom: 0;
-  border-radius: 0;
-  border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-/* Width-based layout containers */
-.live-controls-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 15px;
-}
-
-.live-control-full {
-  flex: 1 1 100%;
-  min-width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 40px;
-  margin-bottom: 25px;
-  padding: 0;
-}
-
-.live-control-half {
-  flex: 1 1 calc(50% - 7.5px);
-  min-width: 250px;
-}
-
-#previewOutput.live .live-object label {
-  display: block;
-  margin-bottom: 8px;
-  color: #fff;
-  font-weight: 500;
-  width: auto;
-}
-
-#previewOutput.live .live-object input,
-#previewOutput.live .live-object select,
-#previewOutput.live .live-object button {
-  background: rgba(0, 0, 0, 0.5);
-  color: #fff;
-  border: 1px solid #555;
-  border-radius: 4px;
-  padding: 8px;
-  box-sizing: border-box;
-}
-
-/* Full width controls - left aligned horizontal layout */
-.live-control-full .control-label {
-  flex: 0 0 auto;
-  color: #fff;
-  font-weight: 500;
-  font-size: 14px;
-  min-width: 250px;
-}
-
-.live-control-full .control-input {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-}
-
-.live-control-full input,
-.live-control-full select,
-.live-control-full button {
-  width: auto;
-  min-width: 150px;
-}
-
-.live-control-full input[type="checkbox"] {
-  margin: 0;
-}
-
-/* Half width controls - inputs take full width of container */
-.live-control-half input,
-.live-control-half select,
-.live-control-half button {
-  width: 100%;
-}
-
-#previewOutput.live .live-object input[type="checkbox"] {
-  width: auto;
-  margin-right: 8px;
-  transform: scale(1.2);
-  accent-color: #4a9eff;
-}
-
-#previewOutput.live .live-object input[type="range"] {
-  width: 100%;
-}
-
-#previewOutput.live .live-object input[type="color"] {
-  width: 60px;
-  height: 40px;
-  padding: 2px;
-}
-
-#previewOutput.live .live-object button {
-  cursor: pointer;
-  background: rgba(100, 100, 100, 0.7);
-  max-width: 200px;
-}
-
-#previewOutput.live .live-object button:hover {
-  background: rgba(150, 150, 150, 0.7);
-}
-
-#previewOutput.live .live-object h3 {
-  margin: 0 0 20px 0;
-  color: #fff;
-  font-size: 16px;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding-bottom: 8px;
-}
-
-#previewOutput.live .live-object p {
-  margin: 0;
-  color: #ccc;
-  font-style: italic;
-}
-
-#previewOutput.live .live-object details {
-  color: #fff;
-}
-
-#previewOutput.live .live-object summary {
-  cursor: pointer;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-#previewOutput.live .live-object .submenu-content {
-  margin-left: 20px;
-  padding-top: 10px;
-}
-
-/* Width-specific styling */
-.live-control-half {
-  margin-bottom: 10px;
-}
-
-/* ESO-style sliders */
-.eso-slider {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.eso-slider input[type="range"] {
-  flex: 1;
-  max-width: 120px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  border-radius: 0;
-  padding: 0;
-}
-
-.eso-slider input[type="range"]::-webkit-slider-thumb {
-  appearance: none;
-  width: 12px;
-  height: 12px;
-  background: #fff;
-  border-radius: 0;
-  cursor: pointer;
-}
-
-.eso-slider input[type="range"]::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  background: #fff;
-  border-radius: 0;
-  cursor: pointer;
-  border: none;
-}
-
-.slider-value {
-  color: #bbb;
-  font-size: 11px;
-  min-width: 20px;
-  text-align: center;
-}
-
-/* Buttons in header */
-.preview-controls {
-  display: flex;
-  gap: 8px;
-}
 
 /* Editor labels and fields */
 #propertyEditor label {
@@ -378,23 +126,7 @@ select {
   margin-top: 3px;
 }
 
-/* Checkbox toggle styling */
-.checkbox-toggle {
-  background: rgba(100, 150, 200, 0.3);
-  color: #fff;
-  padding: 4px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  font-size: 12px;
-  font-weight: bold;
-  min-width: 40px;
-  text-align: center;
-  cursor: pointer;
-  user-select: none;
-}
 
-.checkbox-toggle:hover {
-  background: rgba(100, 150, 200, 0.5);
-}
 
 /* 
 Object sections in editor */
@@ -413,6 +145,42 @@ Object sections in editor */
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.object-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.move-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.move-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 2px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+  min-width: 20px;
+  height: 18px;
+}
+
+.move-btn:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.move-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .object-header h3 {
@@ -519,17 +287,9 @@ Sidebar specific styling */
   color: #333;
 }
 
-/* Live Preview active */
-#preview.live {
-  background: url('img/live_bg.jpg') center/cover no-repeat;
-  color: #f5f5f5;
-}
-
-#preview.live .panel-header {
-  background: rgba(0, 0, 0, 0.8);
-  border-bottom-color: rgba(255, 255, 255, 0.2);
-}
-
-#preview.live .panel-header h2 {
-  color: #f5f5f5;
+/* Simple Prism styling for code preview */
+#previewOutput pre[class*="language-"] {
+  margin: 0;
+  border-radius: 4px;
+  background: #2d2d2d;
 }
