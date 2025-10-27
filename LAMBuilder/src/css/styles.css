@@ -1,0 +1,340 @@
+body {
+  display: grid;
+  grid-template-columns: 200px 2fr 3fr;
+  height: 100vh;
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+/* Shared panel structure */
+.panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 10px 10px 10px;
+  margin: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid;
+}
+
+.panel-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.panel-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.panel-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.panel-separator {
+  margin: 10px 0;
+  border: none;
+  border-top: 1px solid #555;
+}
+
+#sidebar {
+  background: #1e1e1e;
+  color: #fff;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  color: #eee;
+}
+
+#sidebar button {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+#editor {
+  padding: 10px;
+  background: #f5f5f5;
+  overflow-y: auto;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.editor-header h2 {
+  margin: 0;
+  color: #333;
+}
+
+#preview {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background: #f5f5f5;
+}
+
+
+
+/* Inner preview output styling */
+#previewOutput {
+  flex: 1;
+  overflow: auto;
+}
+
+
+
+/* Editor labels and fields */
+#propertyEditor label {
+  display: block;
+  margin-top: 5px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 4px;
+  margin-top: 3px;
+}
+
+
+
+/* 
+Object sections in editor */
+.object-section {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  padding: 0;
+}
+
+.object-header {
+  background: #f0f0f0;
+  padding: 10px 15px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.object-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.move-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.move-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 2px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+  min-width: 20px;
+  height: 18px;
+}
+
+.move-btn:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.move-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.object-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.delete-object-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.delete-object-btn:hover {
+  background: #c82333;
+}
+
+.object-fields {
+  padding: 15px;
+}
+
+.field-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.field-label {
+  flex: 0 0 120px;
+  font-weight: bold;
+  color: #333;
+  padding-top: 5px;
+}
+
+.field-input {
+  flex: 1;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.field-textarea {
+  flex: 1;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  min-height: 60px;
+  font-family: monospace;
+  resize: vertical;
+}/* 
+Sidebar specific styling */
+#sidebar {
+  background: #1e1e1e;
+  color: #fff;
+}
+
+#sidebar .panel-header {
+  background: #1e1e1e;
+  border-bottom-color: #333;
+}
+
+#sidebar button {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  background: #333;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 3px;
+}
+
+#sidebar button:hover {
+  background: #444;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 10px;
+  border-top: 1px solid #333;
+  font-size: 11px;
+  color: #888;
+  text-align: center;
+}
+
+.sidebar-footer .copyright {
+  margin-bottom: 4px;
+}
+
+.sidebar-footer .made-with a {
+  color: #4a9eff;
+  text-decoration: none;
+}
+
+.sidebar-footer .made-with a:hover {
+  text-decoration: underline;
+}
+
+/* Editor specific styling */
+#editor {
+  background: #f5f5f5;
+}
+
+#editor .panel-header {
+  background: #f5f5f5;
+  border-bottom-color: #ddd;
+}
+
+#editor .panel-header h2 {
+  color: #333;
+}
+
+/* Preview specific styling */
+#preview .panel-header {
+  background: #f5f5f5;
+  border-bottom-color: #ddd;
+}
+
+#preview .panel-header h2 {
+  color: #333;
+}
+
+/* Panel control buttons styling */
+.panel-controls button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.panel-controls button:hover {
+  background: #0056b3;
+}
+
+.panel-controls button.delete-style {
+  background: #dc3545;
+}
+
+.panel-controls button.delete-style:hover {
+  background: #c82333;
+}
+
+/* Simple Prism styling for code preview */
+#previewOutput pre[class*="language-"] {
+  margin: 0;
+  border-radius: 4px;
+  background: #2d2d2d;
+}
