@@ -385,6 +385,12 @@ if (addPanelBtn && !addPanelBtn.dataset.bound) {
   addPanelBtn.dataset.bound = true;
 }
 
+const clearMenuBtn = document.getElementById("clearMenuBtn");
+if (clearMenuBtn && !clearMenuBtn.dataset.bound) {
+  clearMenuBtn.onclick = clearMenu;
+  clearMenuBtn.dataset.bound = true;
+}
+
 
 // Bind all the individual add buttons
 const addHeaderBtn = document.getElementById("addHeaderBtn");
@@ -566,6 +572,15 @@ function deletePanelData() {
   }
 }
 
+function clearMenu() {
+  if (confirm("Are you sure you want to clear all panel data and objects? This cannot be undone.")) {
+    panelData = null;
+    editPanelData = false;
+    objects = [];
+    renderUI();
+  }
+}
+
 function renderObjectsContainer() {
   const container = document.getElementById("objectsContainer");
   if (!container) return;
@@ -686,8 +701,6 @@ function renderObjectFields(obj, index) {
     fieldsContainer.appendChild(fieldDiv);
   });
 }
-
-
 
 function renderPreview() {
   const preview = document.getElementById("preview");
