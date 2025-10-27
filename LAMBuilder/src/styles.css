@@ -263,6 +263,28 @@ Sidebar specific styling */
   background: #444;
 }
 
+.sidebar-footer {
+  margin-top: auto;
+  padding: 10px;
+  border-top: 1px solid #333;
+  font-size: 11px;
+  color: #888;
+  text-align: center;
+}
+
+.sidebar-footer .copyright {
+  margin-bottom: 4px;
+}
+
+.sidebar-footer .made-with a {
+  color: #4a9eff;
+  text-decoration: none;
+}
+
+.sidebar-footer .made-with a:hover {
+  text-decoration: underline;
+}
+
 /* Editor specific styling */
 #editor {
   background: #f5f5f5;
@@ -285,6 +307,29 @@ Sidebar specific styling */
 
 #preview .panel-header h2 {
   color: #333;
+}
+
+/* Panel control buttons styling */
+.panel-controls button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.panel-controls button:hover {
+  background: #0056b3;
+}
+
+.panel-controls button.delete-style {
+  background: #dc3545;
+}
+
+.panel-controls button.delete-style:hover {
+  background: #c82333;
 }
 
 /* Simple Prism styling for code preview */

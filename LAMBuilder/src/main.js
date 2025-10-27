@@ -156,6 +156,7 @@ function addPanelData() {
   };
 
   editPanelData = true;
+  saveState();
   renderUI();
 }
 
@@ -167,6 +168,7 @@ function addHeader() {
     width: "full"
   };
   objects.push(newObj);
+  saveState();
   renderUI();
 }
 
@@ -177,6 +179,7 @@ function addDescription() {
     width: "full"
   };
   objects.push(newObj);
+  saveState();
   renderUI();
 }
 
@@ -191,6 +194,7 @@ function addCheckbox() {
     default: true
   };
   objects.push(newObj);
+  saveState();
   renderUI();
 }
 
@@ -208,6 +212,7 @@ function addSlider() {
     default: 50
   };
   objects.push(newObj);
+  saveState();
   renderUI();
 }
 
@@ -222,6 +227,7 @@ function addDropdown() {
     width: "full",
   };
   objects.push(newObj);
+  saveState();
   renderUI();
 }
 
@@ -234,6 +240,7 @@ function addButton() {
     width: "full",
   };
   objects.push(newObj);
+  saveState();
   renderUI();
 }
 
@@ -246,6 +253,7 @@ function addSubmenu() {
     width: "full"
   };
   objects.push(newObj);
+  saveState();
   renderUI();
 }
 
@@ -259,12 +267,16 @@ function addColorpicker() {
     width: "full",
   };
   objects.push(newObj);
+  saveState();
   renderUI();
 }
 
 function removeObject(index) {
-  objects.splice(index, 1);
-  renderUI();
+  if (confirm("Are you sure you want to delete this object? This cannot be undone.")) {
+    objects.splice(index, 1);
+    saveState();
+    renderUI();
+  }
 }
 
 function moveObjectUp(index) {
@@ -272,6 +284,7 @@ function moveObjectUp(index) {
     const temp = objects[index];
     objects[index] = objects[index - 1];
     objects[index - 1] = temp;
+    saveState();
     renderUI();
   }
 }
@@ -281,6 +294,7 @@ function moveObjectDown(index) {
     const temp = objects[index];
     objects[index] = objects[index + 1];
     objects[index + 1] = temp;
+    saveState();
     renderUI();
   }
 }
@@ -291,6 +305,7 @@ function loadSampleMenu() {
   objects = clone.optionsTable;
   editPanelData = true;
 
+  saveState();
   renderUI();
 }
 
@@ -383,6 +398,39 @@ function escapeForLua(s) {
     .replace(/"/g, '\\"')
     .replace(/\r\n/g, "\\n")
     .replace(/\n/g, "\\n");
+}
+
+/////////////////////
+// Local Storage Functions
+/////////////////////
+function saveState() {
+  try {
+    const state = {
+      objects: objects,
+      panelData: panelData,
+      editPanelData: editPanelData,
+      timestamp: Date.now()
+    };
+    localStorage.setItem('lambuilder-state', JSON.stringify(state));
+  } catch (error) {
+    console.warn('Failed to save state to localStorage:', error);
+  }
+}
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('lambuilder-state');
+    if (saved) {
+      const state = JSON.parse(saved);
+      objects = state.objects || [];
+      panelData = state.panelData || null;
+      editPanelData = state.editPanelData || false;
+      return true;
+    }
+  } catch (error) {
+    console.warn('Failed to load state from localStorage:', error);
+  }
+  return false;
 }
 
 /////////////////////
@@ -552,6 +600,7 @@ function renderPanelDataFields() {
       input.value = value ? "true" : "false";
       input.oninput = e => {
         panelData[key] = e.target.value === "true";
+        saveState();
         renderPreview();
       };
     } else if (typeof value === "number") {
@@ -560,6 +609,7 @@ function renderPanelDataFields() {
       input.oninput = e => {
         const n = parseFloat(e.target.value);
         panelData[key] = isNaN(n) ? e.target.value : n;
+        saveState();
         renderPreview();
       };
     } else {
@@ -567,6 +617,7 @@ function renderPanelDataFields() {
       input.value = value == null ? "" : value;
       input.oninput = e => {
         panelData[key] = e.target.value;
+        saveState();
         renderPreview();
         // Update header title if name changes
         if (key === "name") {
@@ -585,9 +636,10 @@ function renderPanelDataFields() {
 }
 
 function deletePanelData() {
-  if (confirm("Are you sure you want to delete panel data?")) {
+  if (confirm("Are you sure you want to delete panel data? This cannot be undone.")) {
     panelData = null;
     editPanelData = false;
+    saveState();
     renderUI();
   }
 }
@@ -597,6 +649,7 @@ function clearMenu() {
     panelData = null;
     editPanelData = false;
     objects = [];
+    saveState();
     renderUI();
   }
 }
@@ -668,6 +721,7 @@ function renderObjectFields(obj, index) {
       input.className = "field-textarea";
       input.oninput = e => {
         objects[index][key].code = e.target.value;
+        saveState();
         renderPreview();
       };
     }
@@ -680,6 +734,7 @@ function renderObjectFields(obj, index) {
         try {
           const parsed = JSON.parse(e.target.value);
           objects[index][key] = parsed;
+          saveState();
           renderPreview();
         } catch (err) {
           alert("Invalid JSON: " + err.message);
@@ -694,6 +749,7 @@ function renderObjectFields(obj, index) {
       input.className = "field-input";
       input.oninput = e => {
         objects[index][key] = e.target.value === "true";
+        saveState();
         renderPreview();
       };
     }
@@ -706,6 +762,7 @@ function renderObjectFields(obj, index) {
       input.oninput = e => {
         const n = parseFloat(e.target.value);
         objects[index][key] = isNaN(n) ? e.target.value : n;
+        saveState();
         renderPreview();
       };
     }
@@ -717,6 +774,7 @@ function renderObjectFields(obj, index) {
       input.className = "field-input";
       input.oninput = e => {
         objects[index][key] = e.target.value;
+        saveState();
         renderPreview();
         // Update header title if name changes
         if (key === "name") {
@@ -759,5 +817,6 @@ function escapeHtml(str) {
     .replace(/'/g, "&#39;");
 }
 
-// Initial render
+// Load saved state and initial render
+loadState();
 renderUI();
