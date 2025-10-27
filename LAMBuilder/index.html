@@ -1,31 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>LAM Builder</title>
   <link rel="stylesheet" href="src/styles.css">
+  <link rel="stylesheet" href="src/prism.css">
 </head>
+
 <body>
-  <div id="sidebar">
-    <h2>LAM Builder</h2>
-    <button id="addElementBtn">+ Add Element</button>
-    <ul id="elementList"></ul>
+
+  <div id="sidebar" class="panel">
+    <div class="panel-header">
+      <h2>LAM Builder</h2>
+    </div>
+    <div class="panel-content">
+      <button id="sampleMenuBtn">Sample Menu</button>
+      <button id="addPanelDataBtn">Add Panel</button>
+      <hr class="panel-separator">
+      <button id="addHeaderBtn">Add Header</button>
+      <button id="addDescriptionBtn">Add Description</button>
+      <button id="addCheckboxBtn">Add Checkbox</button>
+      <button id="addSliderBtn">Add Slider</button>
+      <button id="addDropdownBtn">Add Dropdown</button>
+      <button id="addButtonBtn">Add Button</button>
+      <button id="addSubmenuBtn">Add Submenu</button>
+      <button id="addColorpickerBtn">Add Color Picker</button>
+    </div>
   </div>
 
-  <div id="editor">
-    <h2>Properties</h2>
-    <div id="panelDataEditor"></div>
-    <div id="propertyEditor">Select an element to edit.</div>
+  <div id="editor" class="panel">
+    <div class="panel-header">
+      <h2>Settings Panel</h2>
+      <div class="panel-controls">
+        <button id="clearMenuBtn">Clear Menu</button>
+      </div>
+    </div>
+    <div class="panel-content">
+      <div id="panelDataEditor"></div>
+      <div id="objectsContainer"></div>
+    </div>
   </div>
 
-  <div id="preview">
-    <h2>Lua Preview</h2>
-    <pre id="luaOutput"></pre>
-    <button id="copyBtn">Copy Lua</button>
+  <div id="preview" class="panel">
+    <div class="panel-header">
+      <h2 id="previewTitle">Lua Preview</h2>
+      <div class="panel-controls">
+        <button id="togglePreviewBtn">Switch to Live Preview</button>
+        <button id="copyBtn">Copy Lua</button>
+      </div>
+    </div>
+    <div class="panel-content">
+      <div id="previewOutput"></div>
+    </div>
   </div>
 
-  <script src="src/app.js"></script>
-  <script src="src/ui.js"></script>
-  <script src="src/exporter.js"></script>
+  <script src="src/prism.js"></script>
+  <script src="src/main.js"></script>
 </body>
+
 </html>
