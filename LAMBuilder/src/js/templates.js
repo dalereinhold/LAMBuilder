@@ -5,7 +5,7 @@
 const sampleTemplate = {
   panelData: {
     type: "panel",
-    name: "My Addon",
+    name: "MyAddon",
     displayName: "My Addon Settings",
     author: "AuthorName",
     version: "1.0",
@@ -31,15 +31,17 @@ const sampleTemplate = {
       getFunc: { __luaFn: true, code: "function() return true end" },
       setFunc: { __luaFn: true, code: "function(value) d(value) end" },
       width: "full",
+      default: "sv.enableSetting",
     },
     {
       type: "dropdown",
       name: "My Dropdown",
       tooltip: "Dropdown's tooltip text.",
-      choices: ["table", "of", "choices"],
+      choices: ["Option 1", "Option 2", "Option 3"],
       getFunc: { __luaFn: true, code: "function() return \"of\" end" },
       setFunc: { __luaFn: true, code: "function(var) print(var) end" },
       width: "full",
+      default: "sv.selectedOption",
     },
     {
       type: "slider",
@@ -51,7 +53,7 @@ const sampleTemplate = {
       getFunc: { __luaFn: true, code: "function() return 3 end" },
       setFunc: { __luaFn: true, code: "function(value) d(value) end" },
       width: "full",
-      default: 5,
+      default: "sv.sliderValue",
     },
     {
       type: "colorpicker",
@@ -60,6 +62,7 @@ const sampleTemplate = {
       getFunc: { __luaFn: true, code: "function() return 1, 0, 0, 1 end" },
       setFunc: { __luaFn: true, code: "function(r,g,b,a) print(r, g, b, a) end" },
       width: "full",
+      default: "sv.colorSetting",
     },
     {
       type: "button",
@@ -85,15 +88,17 @@ const sampleTemplate = {
       getFunc: { __luaFn: true, code: "function() return true end" },
       setFunc: { __luaFn: true, code: "function(value) d(value) end" },
       width: "half",
+      default: "true",
     },
     {
       type: "dropdown",
       name: "My Dropdown",
       tooltip: "Dropdown's tooltip text.",
-      choices: ["table", "of", "choices"],
+      choices: ["Option 4", "Option 5", "Option 6"],
       getFunc: { __luaFn: true, code: "function() return \"of\" end" },
       setFunc: { __luaFn: true, code: "function(var) print(var) end" },
       width: "half",
+      default: '"Option 5"',
     },
     {
       type: "slider",
@@ -105,7 +110,7 @@ const sampleTemplate = {
       getFunc: { __luaFn: true, code: "function() return 3 end" },
       setFunc: { __luaFn: true, code: "function(value) d(value) end" },
       width: "half",
-      default: 5,
+      default: "10",
     },
     {
       type: "colorpicker",
@@ -114,6 +119,7 @@ const sampleTemplate = {
       getFunc: { __luaFn: true, code: "function() return 1, 0, 0, 1 end" },
       setFunc: { __luaFn: true, code: "function(r,g,b,a) print(r, g, b, a) end" },
       width: "half",
+      default: "{r=1,g=0,b=0,a=1}",
     },
     {
       type: "button",

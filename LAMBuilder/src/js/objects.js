@@ -65,7 +65,7 @@ function addCheckbox() {
     getFunc: { __luaFn: true, code: "function() return true end" },
     setFunc: { __luaFn: true, code: "function(value) d(value) end" },
     width: "full",
-    default: true
+    default: ""
   };
   objects.push(newObj);
   saveState();
@@ -83,7 +83,7 @@ function addSlider() {
     getFunc: { __luaFn: true, code: "function() return 50 end" },
     setFunc: { __luaFn: true, code: "function(value) d(value) end" },
     width: "full",
-    default: 50
+    default: ""
   };
   objects.push(newObj);
   saveState();
@@ -99,6 +99,7 @@ function addDropdown() {
     getFunc: { __luaFn: true, code: "function() return \"Option 1\" end" },
     setFunc: { __luaFn: true, code: "function(var) print(var) end" },
     width: "full",
+    default: ""
   };
   objects.push(newObj);
   saveState();
@@ -124,7 +125,8 @@ function addSubmenu() {
     name: "New Submenu",
     tooltip: "Submenu tooltip",
     controls: [],
-    width: "full"
+    width: "full",
+    default: ""
   };
   objects.push(newObj);
   saveState();
@@ -139,6 +141,7 @@ function addColorpicker() {
     getFunc: { __luaFn: true, code: "function() return 1, 0, 0, 1 end" },
     setFunc: { __luaFn: true, code: "function(r,g,b,a) print(r, g, b, a) end" },
     width: "full",
+    default: ""
   };
   objects.push(newObj);
   saveState();

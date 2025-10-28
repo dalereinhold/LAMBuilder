@@ -33,8 +33,13 @@ function exportToLua(objectsArr, panelDataOverride) {
       }
 
       // write property
-      // 'type' and 'name' commonly strings: still go through luaValue to handle function objects etc.
-      lua += `        ${key} = ${luaValue(v)},\n`;
+      // Special handling for default field - output as raw text
+      if (key === "default") {
+        lua += `        ${key} = ${v},\n`;
+      } else {
+        // 'type' and 'name' commonly strings: still go through luaValue to handle function objects etc.
+        lua += `        ${key} = ${luaValue(v)},\n`;
+      }
     }
     lua += "    },\n";
   });

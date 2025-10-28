@@ -185,6 +185,18 @@ function renderObjectFields(obj, index) {
         }
       };
     }
+    // Special handling for default field - always treat as raw text
+    else if (key === "default") {
+      input = document.createElement("input");
+      input.type = "text";
+      input.value = value == null ? "" : value;
+      input.className = "field-input";
+      input.oninput = e => {
+        objects[index][key] = e.target.value;
+        saveState();
+        renderPreview();
+      };
+    }
     // Boolean values
     else if (typeof value === "boolean") {
       input = document.createElement("input");
